@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Protected routes
-  if (pathname.startsWith('/menu') || pathname.startsWith('/cart') || pathname.startsWith('/checkout')) {
+  if (pathname.startsWith('/menu') || pathname.startsWith('/cart') || pathname.startsWith('/checkout') || pathname.startsWith('/admin') || pathname.startsWith('/cashier')) {
     if (!token) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
@@ -23,5 +23,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/menu/:path*', '/cart/:path*', '/checkout/:path*', '/auth/:path*'],
+  matcher: ['/menu/:path*', '/cart/:path*', '/checkout/:path*', '/auth/:path*', '/admin/:path*', '/cashier/:path*'],
 }

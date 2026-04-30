@@ -32,6 +32,8 @@ function LoginContent() {
       
       if (user.role === 'ADMIN') {
         window.location.href = '/admin/dashboard';
+      } else if (user.role === 'KASIR') {
+        window.location.href = '/cashier';
       } else {
         window.location.href = '/menu';
       }
