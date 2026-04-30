@@ -28,6 +28,7 @@ export default function MenuPage() {
   const { items: allMenuItems, fetchMenu, loading } = useMenuStore();
   const menuRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const [mounted,        setMounted]        = useState(false);
   const [lastStatus,     setLastStatus]    = useState<string | null>(null);
 
   const playNotifySound = () => {

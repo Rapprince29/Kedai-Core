@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   TrendingUp, Users, ShoppingBag, AlertTriangle, 
-  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle
+  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle, Package
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, 
