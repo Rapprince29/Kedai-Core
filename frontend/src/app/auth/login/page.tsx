@@ -27,8 +27,14 @@ function LoginContent() {
     setLoading(true);
     setError('');
     try {
-      await axios.post('/api/auth/login', formData);
-      window.location.href = '/menu';
+      const res = await axios.post('/api/auth/login', formData);
+      const user = res.data.user;
+      
+      if (user.role === 'ADMIN') {
+        window.location.href = '/admin/dashboard';
+      } else {
+        window.location.href = '/menu';
+      }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
