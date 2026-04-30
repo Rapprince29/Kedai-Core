@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useMenuStore } from '@/store/menuStore';
 import { useCartStore } from '@/store/cartStore';
-import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, SlidersHorizontal } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, SlidersHorizontal, User } from 'lucide-react';
 import Link from 'next/link';
 import MenuCard from '@/components/menu/MenuCard';
 import axios from 'axios';
