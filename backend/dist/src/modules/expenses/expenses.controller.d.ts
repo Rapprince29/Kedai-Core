@@ -4,20 +4,20 @@ export declare class ExpensesController {
     private readonly expensesService;
     constructor(expensesService: ExpensesService);
     findAll(): Promise<{
-        description: string;
         id: string;
         category: string;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
         date: Date;
         amount: number;
     }[]>;
     create(data: Prisma.ExpenseCreateInput): Promise<{
-        description: string;
         id: string;
         category: string;
         createdAt: Date;
         updatedAt: Date;
+        description: string;
         date: Date;
         amount: number;
     }>;
