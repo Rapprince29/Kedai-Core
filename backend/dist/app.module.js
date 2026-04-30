@@ -10,15 +10,19 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const prisma_service_1 = require("./prisma.service");
 const order_gateway_1 = require("./order.gateway");
+const products_module_1 = require("./modules/products/products.module");
+const analytics_module_1 = require("./modules/analytics/analytics.module");
+const expenses_module_1 = require("./modules/expenses/expenses.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
+        imports: [products_module_1.ProductsModule, analytics_module_1.AnalyticsModule, expenses_module_1.ExpensesModule],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, order_gateway_1.OrderGateway],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService, order_gateway_1.OrderGateway],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

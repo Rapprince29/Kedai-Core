@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "Nikmati kelezatan menu spesial kami langsung dari meja Anda.",
 };
 
+import Providers from "./providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,8 +24,11 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
 }
+
