@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// Define local interface to bypass broken @prisma/client exports
 interface CategoryType {
   id: number;
   name: string;
@@ -13,11 +12,15 @@ async function main() {
   
   console.log('Seeding categories...')
   for (const name of categories) {
-    await (prisma as any).category.upsert({
-      where: { name },
-      update: {},
-      create: { name, active: true },
-    })
+    try {
+      await (prisma as any).category.upsert({
+        where: { name },
+        update: {},
+        create: { name, active: true },
+      })
+    } catch (err) {
+      console.log(`Category ${name} already exists or error:`, (err as any).message)
+    }
   }
 
   const categoryMap: CategoryType[] = await (prisma as any).category.findMany()
@@ -76,9 +79,16 @@ async function main() {
 
   console.log('Seeding v2.0 menu...')
   for (const item of menus) {
-    await (prisma as any).menu.create({
-      data: item,
-    })
+    try {
+      const existing = await (prisma as any).menu.findFirst({ where: { name: item.name } })
+      if (!existing) {
+        await (prisma as any).menu.create({ data: item })
+      } else {
+        console.log(`Menu ${item.name} already exists, skipping.`)
+      }
+    } catch (err) {
+      console.log(`Error seeding menu ${item.name}:`, (err as any).message)
+    }
   }
   console.log('Seeding finished.')
 }
