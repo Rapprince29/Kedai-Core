@@ -28,7 +28,7 @@ function LoginContent() {
     setError('');
     try {
       await axios.post('/api/auth/login', formData);
-      router.push('/menu');
+      window.location.href = '/menu';
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
