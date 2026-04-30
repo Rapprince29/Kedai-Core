@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("CUSTOMER") // CUSTOMER, ADMIN
+  createdAt DateTime @default(now())
+}
+
 model Category {
   id     Int     @id @default(autoincrement())
   name   String  @unique
@@ -21,7 +30,7 @@ model Menu {
   price        Float
   category     Category @relation(fields: [categoryId], references: [id])
   categoryId   Int
-  flavor       String?  // Manis, Pahit, Segar, etc.
+  flavor       String?  
   image        String
   stock        Int      @default(0)
   isBestSeller Boolean  @default(false)
@@ -32,7 +41,7 @@ model Order {
   id           String   @id @default(uuid())
   totalPrice   Float
   customerName String
-  items        Json     // Stores array of purchased items
-  status       String   @default("PENDING") // PENDING, DONE
+  items        Json     
+  status       String   @default("PENDING") 
   createdAt    DateTime @default(now())
 }
