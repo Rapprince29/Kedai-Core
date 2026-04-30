@@ -6,6 +6,7 @@ import {
   RefreshCcw, Banknote, AlertCircle, PlayCircle
 } from 'lucide-react';
 import axios from 'axios';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const C = {
   bg:      '#05161A', 
@@ -28,6 +29,7 @@ export default function CashierDashboard() {
   const [currentOrder, setCurrentOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
 
   const fetchRecent = async () => {
     try {
@@ -42,6 +44,26 @@ export default function CashierDashboard() {
     const interval = setInterval(fetchRecent, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (isScanning) {
+      const scanner = new Html5QrcodeScanner("reader", { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 } 
+      }, false);
+
+      scanner.render((decodedText) => {
+        setOrderId(decodedText);
+        searchOrder(decodedText);
+        setIsScanning(false);
+        scanner.clear();
+      }, (err) => {});
+
+      return () => {
+        scanner.clear().catch(() => {});
+      };
+    }
+  }, [isScanning]);
 
   const searchOrder = async (id: string) => {
     setLoading(true);
@@ -89,7 +111,19 @@ export default function CashierDashboard() {
           {/* LEFT: SCAN & CURRENT */}
           <div className="space-y-8">
             <div className="p-8 rounded-[40px] bg-white/5 border border-white/10">
-               <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-6">Synchronize Order</h3>
+               <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30">Synchronize Order</h3>
+                  <button 
+                    onClick={() => setIsScanning(!isScanning)}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isScanning ? 'bg-red-400/20 text-red-400 border border-red-400/30' : 'bg-teal-400/10 text-teal-400 border border-teal-400/30'}`}
+                  >
+                    {isScanning ? 'CLOSE CAMERA' : 'OPEN SCANNER'}
+                  </button>
+               </div>
+
+               {isScanning && (
+                 <div id="reader" className="mb-6 rounded-3xl overflow-hidden border-2 border-teal-400/20 bg-black/40"></div>
+               )}
                <div className="relative group">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30 group-focus-within:opacity-100 text-teal-400 transition-all" />
                   <input 
