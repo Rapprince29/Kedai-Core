@@ -10,7 +10,11 @@ const C = {
   dark: '#072E33'
 };
 
-export default function Preloader() {
+interface PreloaderProps {
+  onDone?: () => void;
+}
+
+export default function Preloader({ onDone }: PreloaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -23,7 +27,10 @@ export default function Preloader() {
           yPercent: -100,
           duration: 0.8,
           ease: 'power4.inOut',
-          display: 'none'
+          display: 'none',
+          onComplete: () => {
+            if (onDone) onDone();
+          }
         });
       }
     });
@@ -51,7 +58,7 @@ export default function Preloader() {
     });
 
     return () => { tl.kill(); };
-  }, []);
+  }, [onDone]);
 
   return (
     <div

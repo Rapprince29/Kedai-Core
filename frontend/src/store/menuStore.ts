@@ -9,6 +9,8 @@ export interface MenuItem {
   category: string;
   image: string;
   stock: number;
+  flavor?: string;
+  isBestSeller?: boolean;
   createdAt?: string;
 }
 
