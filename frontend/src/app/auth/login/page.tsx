@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, ChevronRight, Waves, Zap, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ const C = {
   border:  'rgba(15,150,156,0.15)'
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -101,5 +101,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-white" style={{ backgroundColor: '#05161A' }}>
+        <Waves className="w-10 h-10 animate-pulse text-teal-500 opacity-20" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
