@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const orders = await prisma.order.findMany({
+    const orders = await (prisma as any).order.findMany({
       orderBy: { createdAt: 'desc' }
     })
     return NextResponse.json(orders)
@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const order = await prisma.order.create({
+    const order = await (prisma as any).order.create({
       data: {
         totalPrice: body.totalPrice,
         customerName: body.customerName,

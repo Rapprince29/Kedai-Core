@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Category } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -7,15 +7,15 @@ async function main() {
   
   console.log('Seeding categories...')
   for (const name of categories) {
-    await prisma.category.upsert({
+    await (prisma as any).category.upsert({
       where: { name },
       update: {},
       create: { name, active: true },
     })
   }
 
-  const categoryMap = await prisma.category.findMany()
-  const getCatId = (name: string) => categoryMap.find(c => c.name === name)?.id || 1
+  const categoryMap: Category[] = await (prisma as any).category.findMany()
+  const getCatId = (name: string) => categoryMap.find((c: Category) => c.name === name)?.id || 1
 
   const menus = [
     {
@@ -65,7 +65,7 @@ async function main() {
 
   console.log('Seeding menu...')
   for (const item of menus) {
-    await prisma.menu.create({
+    await (prisma as any).menu.create({
       data: item,
     })
   }
