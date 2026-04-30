@@ -90,7 +90,7 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
           />
         </div>
 
-        <div className="flex-grow flex flex-col justify-between min-w-0">
+        <div className="flex-grow flex flex-col justify-center min-w-0">
           <div className="relative">
             {isBest && (
               <span className="text-[8px] font-black uppercase tracking-[0.3em] mb-1 block" style={{ color: C.terra }}>
@@ -98,7 +98,7 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
               </span>
             )}
             <h3
-              className="font-bold text-base tracking-tight leading-snug"
+              className="font-bold text-base tracking-tight leading-snug truncate"
               style={{ color: '#fff', fontFamily: "'DM Sans', sans-serif" }}
             >
               {item.name}
@@ -118,34 +118,34 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
               Rp {item.price.toLocaleString('id-ID')}
             </p>
           </div>
+        </div>
 
-          <div className="flex justify-end mt-2">
-            {cartItem ? (
-              <div
-                className="flex items-center gap-4 px-3 py-1.5 rounded-full"
-                style={{ backgroundColor: C.accent, border: `1px solid ${C.terra}30` }}
-              >
-                <button onClick={(e) => handleUpdate(e, -1)} className="transition-transform active:scale-75">
-                  <Minus className="w-3.5 h-3.5 text-white" />
-                </button>
-                <span className="text-sm font-black w-4 text-center text-white">
-                  {cartItem.quantity}
-                </span>
-                <button onClick={(e) => handleUpdate(e, 1)} className="transition-transform active:scale-75">
-                  <Plus className="w-3.5 h-3.5 text-white" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleAdd}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 text-white"
-                style={{ backgroundColor: C.accent, boxShadow: `0 4px 16px ${C.accent}40` }}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Add
+        <div className="flex flex-col justify-center items-end shrink-0 min-w-[100px]">
+          {cartItem ? (
+            <div
+              className="flex items-center gap-3 px-2 py-1.5 rounded-full"
+              style={{ backgroundColor: C.accent, border: `1px solid ${C.terra}30` }}
+            >
+              <button onClick={(e) => handleUpdate(e, -1)} className="transition-transform active:scale-75">
+                <Minus className="w-3 h-3 text-white" />
               </button>
-            )}
-          </div>
+              <span className="text-xs font-black w-4 text-center text-white">
+                {cartItem.quantity}
+              </span>
+              <button onClick={(e) => handleUpdate(e, 1)} className="transition-transform active:scale-75">
+                <Plus className="w-3 h-3 text-white" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 text-white whitespace-nowrap"
+              style={{ backgroundColor: C.accent, boxShadow: `0 4px 16px ${C.accent}40` }}
+            >
+              <Plus className="w-3 h-3" />
+              Add
+            </button>
+          )}
         </div>
       </div>
 
