@@ -3,11 +3,11 @@ import { prisma } from '@/lib/prisma'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { role } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const updated = await (prisma as any).user.update({
       where: { id },
