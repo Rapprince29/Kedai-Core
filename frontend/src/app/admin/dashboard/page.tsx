@@ -93,10 +93,7 @@ export default function AdminDashboard() {
               <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Today's Revenue</p>
               <p className="text-2xl font-black text-teal-400">Rp {data?.todayRevenue.toLocaleString()}</p>
            </div>
-           <button 
-             onClick={fetchData}
-             className="p-4 rounded-2xl border transition-all active:scale-95 bg-white/5 border-white/5" 
-           >
+           <button onClick={fetchData} className="p-4 rounded-2xl border transition-all active:scale-95 bg-white/5 border-white/5">
              <RefreshCcw className="w-5 h-5 text-teal-400" />
            </button>
            <button 
@@ -203,7 +200,7 @@ export default function AdminDashboard() {
            {/* Revenue Chart */}
            <div className="p-8 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 opacity-40">Velocity Trend</h3>
-              <div className="h-48">
+              <div className="h-48 mb-8">
                  <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data?.dailyTrend}>
                        <XAxis dataKey="date" hide />
@@ -212,8 +209,10 @@ export default function AdminDashboard() {
                     </AreaChart>
                  </ResponsiveContainer>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-           <div className="p-10 rounded-[48px] bg-white/5 border border-white/10 overflow-hidden relative group">
+           </div>
+
+           {/* Stock Alerts */}
+           <div className="p-8 rounded-[40px] bg-white/5 border border-white/10">
               <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-8">Stock Criticality (Inventory)</h3>
               <div className="space-y-4">
                  {[
@@ -231,7 +230,8 @@ export default function AdminDashboard() {
               </div>
            </div>
 
-           <div className="p-10 rounded-[48px] bg-white/5 border border-white/10">
+           {/* Staff Sync */}
+           <div className="p-8 rounded-[40px] bg-white/5 border border-white/10">
               <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-8">Staff Sync (Active Shift)</h3>
               <div className="flex items-center gap-6 p-6 rounded-3xl bg-teal-400/10 border border-teal-400/20">
                  <div className="w-16 h-16 rounded-2xl bg-teal-400 flex items-center justify-center font-black text-2xl text-[#05161A]">Y</div>
