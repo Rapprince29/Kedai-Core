@@ -121,20 +121,50 @@ export default function CheckoutPage() {
              </div>
           </div>
         ) : (
-          <div className="text-center space-y-10 animate-in zoom-in-95">
-             <div className="space-y-8">
-                <div className="p-10 rounded-[48px] bg-white border-8 border-teal-400/20 mx-auto w-fit shadow-[0_0_80px_rgba(15,150,156,0.2)]">
-                   <QRCodeSVG value={orderId || ''} size={200} />
+          <div className="text-center space-y-8 animate-in zoom-in-95">
+             <div className="p-8 rounded-[40px] bg-white border-8 border-teal-400/20 mx-auto w-fit shadow-[0_0_80px_rgba(15,150,156,0.15)] mb-4">
+                <QRCodeSVG value={orderId || ''} size={160} />
+             </div>
+
+             {/* ── DIGITAL RECEIPT (STRUK) ── */}
+             <div className="p-8 rounded-[40px] bg-white/5 border border-white/5 text-left space-y-6 relative overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-teal-400/20 rounded-full mt-2" />
+                
+                <div className="flex justify-between items-end">
+                   <div>
+                      <h3 className="text-xl font-black uppercase tracking-tighter">DIGITAL RECEIPT</h3>
+                      <p className="text-[9px] font-mono opacity-30">REF: {orderId?.slice(0,18)}...</p>
+                   </div>
+                   <div className="text-right">
+                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded bg-teal-400/10 text-teal-400">
+                        {method} SYNC
+                      </span>
+                   </div>
                 </div>
-                <div>
-                   <h3 className="text-2xl font-black tracking-tight mb-2 uppercase">PRESENT TO ARCHITECT</h3>
-                   <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
-                     The cashier will scan this code to synchronize your {method === 'CARDLESS' ? 'Cardless Sync' : 'Cash Payment'} and begin crafting your essence.
-                   </p>
+
+                <div className="space-y-3 py-4 border-y border-white/5">
+                   {items.map((item, i) => (
+                      <div key={i} className="flex justify-between items-center text-xs">
+                         <div className="flex gap-3 items-center">
+                            <span className="font-black text-teal-400 opacity-60">{item.quantity}x</span>
+                            <span className="font-bold uppercase tracking-tight">{item.name}</span>
+                         </div>
+                         <p className="font-mono opacity-40">Rp {(item.price * item.quantity).toLocaleString()}</p>
+                      </div>
+                   ))}
                 </div>
-                <div className="p-4 rounded-2xl bg-teal-400/10 border border-teal-400/20 w-fit mx-auto">
-                   <p className="text-[10px] font-mono text-teal-400 uppercase tracking-widest">ORDER ID: {orderId}</p>
+
+                <div className="flex justify-between items-center">
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-30">Total Essence Energy</p>
+                   <p className="text-2xl font-black text-teal-400">Rp {getTotalPrice().toLocaleString()}</p>
                 </div>
+             </div>
+
+             <div>
+                <h3 className="text-xl font-black tracking-tight mb-2 uppercase">PRESENT TO ARCHITECT</h3>
+                <p className="text-[9px] font-black opacity-30 uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
+                  Show this receipt to the cashier for payment validation and order processing.
+                </p>
              </div>
              
              <button 
