@@ -61,7 +61,7 @@ export default function MenuPage() {
            setLastStatus(res.data.status);
         }
       } catch (err) {}
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [fetchMenu, lastStatus]);

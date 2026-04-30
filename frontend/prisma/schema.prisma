@@ -12,7 +12,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("CUSTOMER") // CUSTOMER, ADMIN
+  role      String   @default("CUSTOMER") // CUSTOMER, KASIR, ADMIN
   createdAt DateTime @default(now())
 }
 
@@ -41,10 +41,11 @@ model Menu {
 model Transaction {
   id           String   @id @default(uuid())
   totalPrice   Float
-  customerName String
-  items        Json     
-  status       String   @default("PENDING") // PENDING, PROCESSING, OUT_FOR_DELIVERY, DONE
-  paymentProof String?
+  customerName  String
+  items         Json     
+  status        String   @default("PENDING") 
+  paymentMethod String?  @default("CASH") // CASH, CARDLESS
+  paymentProof  String?
   createdAt    DateTime @default(now())
 }
 

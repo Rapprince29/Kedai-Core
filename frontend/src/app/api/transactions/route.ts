@@ -1,32 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-
-export async function GET() {
-  try {
-    const orders = await (prisma as any).order.findMany({
-      orderBy: { createdAt: 'desc' }
-    })
-    return NextResponse.json(orders)
-  } catch (error) {
-    console.error('Failed to fetch orders:', error)
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
-  }
-}
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const order = await (prisma as any).order.create({
+    const { items, totalPrice, method } = await request.json()
+    
+    // Get user from token
+    const cookieStore = await cookies()
+    const token = cookieStore.get('token')?.value
+    let customerName = 'Guest'
+    
+    if (token) {
+       try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
+          customerName = decoded.name || 'Explorer'
+       } catch (err) {}
+    }
+
+    const transaction = await (prisma as any).transaction.create({
       data: {
-        totalPrice: body.totalPrice,
-        customerName: body.customerName,
-        items: body.items,
-        status: 'PENDING'
+        totalPrice,
+        customerName,
+        items: JSON.stringify(items),
+        status: 'PENDING',
+        paymentMethod: method || 'CASH'
       }
     })
-    return NextResponse.json(order)
+
+    return NextResponse.json(transaction)
   } catch (error) {
-    console.error('Failed to create order:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    console.error('Checkout error:', error)
+    return NextResponse.json({ error: 'Checkout failed' }, { status: 500 })
   }
+}
+
+export async function GET() {
+   try {
+      const transactions = await (prisma as any).transaction.findMany({
+         orderBy: { createdAt: 'desc' },
+         take: 20
+      });
+      return NextResponse.json(transactions);
+   } catch (error) {
+      return NextResponse.json({ error: 'Failed to fetch transactions' }, { status: 500 });
+   }
 }

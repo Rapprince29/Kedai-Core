@@ -37,10 +37,9 @@ export default function AdminUsersPage() {
     }
   };
 
-  const toggleRole = async (userId: string, currentRole: string) => {
-    const newRole = currentRole === 'ADMIN' ? 'CUSTOMER' : 'ADMIN';
+  const toggleRole = async (userId: string, currentRole: string, nextRole: string) => {
     try {
-      await axios.patch(`/api/admin/users/${userId}/role`, { role: newRole });
+      await axios.patch(`/api/admin/users/${userId}/role`, { role: nextRole });
       fetchUsers();
     } catch (err) {
       alert('Failed to update role');
@@ -124,7 +123,11 @@ export default function AdminUsersPage() {
               </div>
               
               <button 
-                onClick={() => toggleRole(user.id, user.role)}
+                onClick={() => {
+                  const roles = ['CUSTOMER', 'KASIR', 'ADMIN'];
+                  const nextIndex = (roles.indexOf(user.role) + 1) % roles.length;
+                  toggleRole(user.id, user.role, roles[nextIndex]);
+                }}
                 className="px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] bg-white/5 hover:bg-teal-400/10 border border-white/10 hover:border-teal-400/30 transition-all active:scale-95 text-teal-400"
               >
                 Change Role
