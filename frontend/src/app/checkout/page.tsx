@@ -42,8 +42,8 @@ export default function CheckoutPage() {
       } else {
          // Logic for Cardless (Redirect to Midtrans/etc)
       }
-    } catch (err) {
-      alert('Checkout failed');
+    } catch (err: any) {
+      alert(`Checkout failed: ${err.response?.data?.error || err.message}`);
     } finally {
       setLoading(false);
     }
