@@ -1,6 +1,12 @@
-import { PrismaClient, Category } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+// Define local interface to bypass broken @prisma/client exports
+interface CategoryType {
+  id: number;
+  name: string;
+}
 
 async function main() {
   const categories = ['Coffee', 'Pastry', 'Non-Coffee']
@@ -14,8 +20,8 @@ async function main() {
     })
   }
 
-  const categoryMap: Category[] = await (prisma as any).category.findMany()
-  const getCatId = (name: string) => categoryMap.find((c: Category) => c.name === name)?.id || 1
+  const categoryMap: CategoryType[] = await (prisma as any).category.findMany()
+  const getCatId = (name: string) => categoryMap.find((c: CategoryType) => c.name === name)?.id || 1
 
   const menus = [
     {
