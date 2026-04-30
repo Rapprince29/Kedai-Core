@@ -132,18 +132,18 @@ export default function MenuPage() {
               await axios.post('/api/auth/logout');
               window.location.href = '/auth/login';
             }}
-            className="p-2.5 rounded-2xl transition-all hover:scale-105 active:scale-95 opacity-40 hover:opacity-100"
+            className="p-2 md:p-2.5 rounded-xl md:rounded-2xl transition-all hover:scale-105 active:scale-95 opacity-40 hover:opacity-100"
             style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <Zap className="w-5 h-5 text-red-400" />
+            <Zap className="w-4 h-4 md:w-5 md:h-5 text-red-400" />
           </button>
           
           <Link href="/cart"
-            className="relative p-3 rounded-2xl transition-all hover:scale-105 active:scale-95"
+            className="relative p-2.5 md:p-3 rounded-xl md:rounded-2xl transition-all hover:scale-105 active:scale-95"
             style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <ShoppingCart className="w-5 h-5" style={{ color: C.terra }} />
+            <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" style={{ color: C.terra }} />
             {getTotalItems() > 0 && (
               <span
-                className="absolute -top-1 -right-1 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full text-[#05161A]"
+                className="absolute -top-1 -right-1 text-[8px] md:text-[10px] font-black w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full text-[#05161A]"
                 style={{ backgroundColor: C.terra }}>
                 {getTotalItems()}
               </span>
@@ -252,15 +252,15 @@ export default function MenuPage() {
             <p className="mt-4 text-[10px] font-black uppercase tracking-[0.5em] opacity-30">Syncing with Deep Sea...</p>
           </div>
         ) : filteredMenu.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredMenu.map((item, index) => (
-              <MenuCard
-                key={item.id}
-                item={item}
-                ref={(el) => { menuRefs.current[index] = el; }}
-              />
-            ))}
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pb-20">
+          {filteredMenu.map((item, idx) => (
+            <MenuCard 
+              key={item.id} 
+              item={item} 
+              ref={el => { menuRefs.current[idx] = el; }}
+            />
+          ))}
+        </div>
         ) : (
           <div className="py-24 text-center opacity-40">
              <Search className="w-12 h-12 mx-auto mb-4" />

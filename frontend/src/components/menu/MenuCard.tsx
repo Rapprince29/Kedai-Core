@@ -62,7 +62,7 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
       <div
         ref={ref}
         onClick={() => setShowModal(true)}
-        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer active:scale-[0.98] h-[140px] ${isBest ? 'scale-[1.02]' : ''}`}
+        className={`flex gap-3 md:gap-4 p-3 md:p-4 rounded-2xl md:rounded-3xl transition-all duration-300 hover:shadow-lg cursor-pointer active:scale-[0.98] h-[130px] md:h-[140px] ${isBest ? 'scale-[1.02]' : ''}`}
         style={{
           backgroundColor: C.white,
           border: isBest ? `1px solid ${C.terra}60` : `1px solid ${C.border}`,
@@ -90,46 +90,46 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
           />
         </div>
 
-        <div className="flex-grow flex flex-col justify-center min-w-0 h-full py-2">
+        <div className="flex-grow flex flex-col justify-center min-w-0 h-full py-1 md:py-2">
           <div className="relative">
-            <div className="h-5 flex items-center">
+            <div className="h-4 md:h-5 flex items-center">
               {isBest ? (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/30">
-                  <Star className="w-2.5 h-2.5 text-teal-400 fill-teal-400" />
-                  <span className="text-[7px] font-black uppercase tracking-[0.2em] text-teal-400">
+                <div className="flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/30">
+                  <Star className="w-2 md:w-2.5 h-2 md:h-2.5 text-teal-400 fill-teal-400" />
+                  <span className="text-[6px] md:text-[7px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] text-teal-400">
                     Artisan Pick
                   </span>
                 </div>
               ) : (
-                <div className="h-1" /> // Invisible spacer for alignment
+                <div className="h-1" />
               )}
             </div>
             <h3
-              className="font-black text-lg tracking-tighter leading-none mt-1 truncate"
+              className="font-black text-sm md:text-lg tracking-tighter leading-none mt-1 truncate"
               style={{ color: '#fff', fontFamily: "'Outfit', sans-serif" }}
             >
               {item.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1.5">
-               <p className="text-[9px] font-black tracking-widest uppercase opacity-30" style={{ color: C.brown }}>
+            <div className="flex items-center gap-1.5 md:gap-2 mt-1 md:mt-1.5">
+               <p className="text-[8px] md:text-[9px] font-black tracking-widest uppercase opacity-30" style={{ color: C.brown }}>
                 {item.category}
               </p>
               {item.flavor && (
-                <span className="text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest" 
+                <span className="text-[7px] md:text-[8px] px-1.5 md:px-2 py-0.5 rounded-full font-black uppercase tracking-widest" 
                   style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: C.brown, border: '1px solid rgba(255,255,255,0.1)' }}>
                   {item.flavor}
                 </span>
               )}
             </div>
             
-            <div className="flex items-center gap-3 mt-3">
-              <p className="text-sm font-black text-white/90">
-                <span className="opacity-40 text-[10px] mr-1">IDR</span>
+            <div className="flex items-center gap-2 md:gap-3 mt-2 md:mt-3">
+              <p className="text-xs md:text-sm font-black text-white/90">
+                <span className="opacity-40 text-[8px] md:text-[10px] mr-0.5 md:mr-1">IDR</span>
                 {item.price.toLocaleString('id-ID')}
               </p>
-              <div className="flex items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-0.5 md:gap-1 opacity-40 hover:opacity-100 transition-opacity">
                 {[1,2,3,4,5].map(star => (
-                  <Star key={star} className="w-2.5 h-2.5 text-yellow-500 cursor-pointer" />
+                  <Star key={star} className="w-2 md:w-2.5 h-2 md:h-2.5 text-yellow-500 cursor-pointer" />
                 ))}
               </div>
             </div>
@@ -137,29 +137,29 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
         </div>
 
         {/* ── RIGID ACTION ZONE ── */}
-        <div className="flex flex-col justify-center items-center shrink-0 w-[120px] border-l border-white/5 ml-2">
+        <div className="flex flex-col justify-center items-center shrink-0 w-[90px] md:w-[120px] border-l border-white/5 ml-1 md:ml-2 pl-1 md:pl-0">
           {cartItem ? (
             <div
-              className="flex items-center gap-3 px-3 py-2 rounded-2xl"
+              className="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2 rounded-xl md:rounded-2xl"
               style={{ backgroundColor: C.white, border: `1px solid ${C.terra}40` }}
             >
-              <button onClick={(e) => handleUpdate(e, -1)} className="p-1 hover:bg-white/5 rounded-lg transition-all">
-                <Minus className="w-3 h-3 text-teal-400" />
+              <button onClick={(e) => handleUpdate(e, -1)} className="p-0.5 md:p-1 hover:bg-white/5 rounded-lg transition-all">
+                <Minus className="w-2.5 md:w-3 h-2.5 md:h-3 text-teal-400" />
               </button>
-              <span className="text-xs font-black w-4 text-center text-white">
+              <span className="text-xs font-black w-3 md:w-4 text-center text-white">
                 {cartItem.quantity}
               </span>
-              <button onClick={(e) => handleUpdate(e, 1)} className="p-1 hover:bg-white/5 rounded-lg transition-all">
-                <Plus className="w-3 h-3 text-teal-400" />
+              <button onClick={(e) => handleUpdate(e, 1)} className="p-0.5 md:p-1 hover:bg-white/5 rounded-lg transition-all">
+                <Plus className="w-2.5 md:w-3 h-2.5 md:h-3 text-teal-400" />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAdd}
-              className="group flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 text-[#05161A]"
+              className="group flex items-center gap-1 md:gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] transition-all hover:scale-105 active:scale-95 text-[#05161A]"
               style={{ backgroundColor: C.terra, boxShadow: `0 8px 24px ${C.terra}30` }}
             >
-              <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+              <Plus className="w-3 md:w-4 h-3 md:h-4 transition-transform group-hover:rotate-90" />
               Add
             </button>
           )}
