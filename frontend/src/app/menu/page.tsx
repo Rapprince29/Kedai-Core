@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, Filter } from 'lucide-react';
 import Link from 'next/link';
 import MenuCard from '@/components/menu/MenuCard';
+import axios from 'axios';
 
 const C = {
   bg:      '#05161A', // Deep Sea Background
@@ -99,18 +100,30 @@ export default function MenuPage() {
           </div>
         </div>
 
-        <Link href="/cart"
-          className="relative p-3 rounded-2xl transition-all hover:scale-105 active:scale-95"
-          style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-          <ShoppingCart className="w-5 h-5" style={{ color: C.terra }} />
-          {getTotalItems() > 0 && (
-            <span
-              className="absolute -top-1 -right-1 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full text-[#05161A]"
-              style={{ backgroundColor: C.terra }}>
-              {getTotalItems()}
-            </span>
-          )}
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              await axios.post('/api/auth/logout');
+              window.location.href = '/auth/login';
+            }}
+            className="p-2.5 rounded-2xl transition-all hover:scale-105 active:scale-95 opacity-40 hover:opacity-100"
+            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+            <Zap className="w-5 h-5 text-red-400" />
+          </button>
+          
+          <Link href="/cart"
+            className="relative p-3 rounded-2xl transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+            <ShoppingCart className="w-5 h-5" style={{ color: C.terra }} />
+            {getTotalItems() > 0 && (
+              <span
+                className="absolute -top-1 -right-1 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full text-[#05161A]"
+                style={{ backgroundColor: C.terra }}>
+                {getTotalItems()}
+              </span>
+            )}
+          </Link>
+        </div>
       </header>
 
       {/* ── HERO HEADER ── */}
