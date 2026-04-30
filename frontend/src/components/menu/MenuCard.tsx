@@ -1,7 +1,7 @@
 'use client';
 
 import { MenuItem, useCartStore } from '@/store/cartStore';
-import { Plus, Minus, X, Info } from 'lucide-react';
+import { Plus, Minus, X, Info, Star } from 'lucide-react';
 import React, { forwardRef, useState } from 'react';
 
 const C = {
@@ -55,22 +55,29 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
     updateQuantity(item.id, delta);
   };
 
+  const isBest = item.isBestSeller;
+
   return (
     <>
       <div
         ref={ref}
         onClick={() => setShowModal(true)}
-        className="flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-md cursor-pointer active:scale-[0.98]"
+        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-md cursor-pointer active:scale-[0.98] ${isBest ? 'scale-[1.02]' : ''}`}
         style={{
           backgroundColor: C.white,
-          border: `1px solid ${C.border}`,
-          boxShadow: `0 4px 20px rgba(0,0,0,0.2)`,
+          border: isBest ? `1px solid ${C.terra}60` : `1px solid ${C.border}`,
+          boxShadow: isBest ? `0 8px 32px ${C.terra}15` : `0 4px 20px rgba(0,0,0,0.2)`,
         }}
       >
         <div
           className="w-[90px] h-[90px] rounded-[16px] overflow-hidden shrink-0 relative"
           style={{ backgroundColor: C.warm }}
         >
+          {isBest && (
+            <div className="absolute top-0 left-0 z-10 p-1 rounded-br-lg" style={{ backgroundColor: C.terra }}>
+              <Star className="w-3 h-3 text-[#051F20] fill-[#051F20]" />
+            </div>
+          )}
           <img
             src={imgSrc}
             alt={item.name}
@@ -84,7 +91,12 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
         </div>
 
         <div className="flex-grow flex flex-col justify-between min-w-0">
-          <div>
+          <div className="relative">
+            {isBest && (
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] mb-1 block" style={{ color: C.terra }}>
+                Best Seller
+              </span>
+            )}
             <h3
               className="font-bold text-base italic leading-snug"
               style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}
@@ -146,7 +158,13 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
               <X className="w-5 h-5" />
             </button>
             
-            <div className="h-64 w-full">
+            <div className="h-64 w-full relative">
+              {isBest && (
+                <div className="absolute top-4 left-4 z-10 px-4 py-2 rounded-full flex items-center gap-2" style={{ backgroundColor: `${C.terra}E6` }}>
+                  <Star className="w-4 h-4 text-[#051F20] fill-[#051F20]" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#051F20]">Artisan Top Pick</span>
+                </div>
+              )}
               <img src={imgSrc} alt={item.name} className="w-full h-full object-cover" />
             </div>
             

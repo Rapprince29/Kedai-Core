@@ -9,18 +9,35 @@ export async function PUT(
     const { id: idParam } = await params
     const id = Number(idParam)
     const body = await request.json()
+
+    // Find or create category if it's changing
+    let categoryId = undefined
+    if (body.category) {
+      let category = await prisma.category.findUnique({
+        where: { name: body.category }
+      })
+      if (!category) {
+        category = await prisma.category.create({
+          data: { name: body.category }
+        })
+      }
+      categoryId = category.id
+    }
+
     const menu = await prisma.menu.update({
       where: { id },
       data: {
         name: body.name,
         description: body.description,
         price: Number(body.price),
-        category: body.category,
+        categoryId: categoryId,
         image: body.image,
         stock: Number(body.stock),
-      }
+        isBestSeller: body.isBestSeller,
+      },
+      include: { category: true }
     })
-    return NextResponse.json(menu)
+    return NextResponse.json({ ...menu, category: menu.category.name })
   } catch (error) {
     console.error('Failed to update menu:', error)
     return NextResponse.json({ error: 'Failed to update menu' }, { status: 500 })

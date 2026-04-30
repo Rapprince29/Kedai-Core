@@ -8,6 +8,7 @@ export interface MenuItem {
   image: string;
   category: string;
   stock?: number;
+  isBestSeller?: boolean;
 }
 
 export interface CartItem extends MenuItem {
