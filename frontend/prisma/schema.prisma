@@ -39,14 +39,31 @@ model Menu {
 }
 
 model Transaction {
-  id           String   @id @default(uuid())
-  totalPrice   Float
+  id            String   @id @default(uuid())
+  totalPrice    Float
   customerName  String
   items         Json     
   status        String   @default("PENDING") 
-  paymentMethod String?  @default("CASH") // CASH, CARDLESS
-  paymentProof  String?
-  createdAt    DateTime @default(now())
+  paymentMethod String?  @default("CASH")
+  tableId       String?
+  promoCode     String?
+  createdAt     DateTime @default(now())
+}
+
+model Table {
+  id       String @id @default(uuid())
+  number   Int    @unique
+  status   String @default("AVAILABLE") // AVAILABLE, OCCUPIED
+  capacity Int    @default(2)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  type      String   @default("INFO") // INFO, URGENT, STOCK
+  targetRole String? // ADMIN, KASIR, CUSTOMER
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Rating {

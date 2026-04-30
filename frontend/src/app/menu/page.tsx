@@ -70,6 +70,20 @@ export default function MenuPage() {
     return () => clearInterval(interval);
   }, [fetchMenu, lastStatus]);
 
+  // GSAP STAGGER ENTRANCE
+  useLayoutEffect(() => {
+    if (!loading && mounted && menuRefs.current.length > 0) {
+      gsap.from(menuRefs.current, {
+        y: 60,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power4.out',
+        clearProps: 'all'
+      });
+    }
+  }, [loading, mounted, allMenuItems]);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(HISTORY_KEY);

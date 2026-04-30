@@ -108,8 +108,36 @@ export default function CashierDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
-          {/* LEFT: SCAN & CURRENT */}
+          {/* LEFT: SCAN & CURRENT & TABLES */}
           <div className="space-y-8">
+            {/* ── TABLE MAP ── */}
+            <div className="p-8 rounded-[40px] bg-white/5 border border-white/10">
+               <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30">Table Management Map</h3>
+                  <div className="flex gap-4">
+                     <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-teal-400" />
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-40">Ready</span>
+                     </div>
+                     <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-400" />
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-40">Active</span>
+                     </div>
+                  </div>
+               </div>
+               <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                  {[1,2,3,4,5,6,7,8,9,10,11,12].map(num => (
+                    <div 
+                      key={num}
+                      className={`aspect-square rounded-xl border-2 flex flex-col items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${num % 3 === 0 ? 'border-red-400/30 bg-red-400/5' : 'border-teal-400/20 bg-teal-400/5'}`}
+                    >
+                       <span className="text-[10px] font-black uppercase opacity-20">T-</span>
+                       <span className={`text-lg font-black ${num % 3 === 0 ? 'text-red-400' : 'text-teal-400'}`}>{num}</span>
+                    </div>
+                  ))}
+               </div>
+            </div>
+
             <div className="p-8 rounded-[40px] bg-white/5 border border-white/10">
                <div className="flex justify-between items-center mb-6">
                   <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30">Synchronize Order</h3>
@@ -199,8 +227,26 @@ export default function CashierDashboard() {
             )}
           </div>
 
-          {/* RIGHT: RECENT QUEUE */}
+          {/* RIGHT: RECENT QUEUE & ALERTS */}
           <div className="space-y-6">
+             <div className="p-8 rounded-[40px] bg-white/5 border border-white/10 mb-8">
+                <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-6">Internal Command Signal</h3>
+                <div className="grid grid-cols-2 gap-4">
+                   <button 
+                     onClick={() => alert('Urgent signal sent to Admin')}
+                     className="py-4 rounded-2xl bg-red-400/10 border border-red-400/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-400/20 transition-all"
+                   >
+                     CALL ADMIN
+                   </button>
+                   <button 
+                     onClick={() => alert('Kitchen notified: Stock Alert')}
+                     className="py-4 rounded-2xl bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[10px] font-black uppercase tracking-widest hover:bg-orange-400/20 transition-all"
+                   >
+                     STOCK ALERT
+                   </button>
+                </div>
+             </div>
+
              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 flex items-center gap-3">
                 <RefreshCcw className="w-4 h-4" /> RECENT RESONANCE (QUEUE)
              </h3>

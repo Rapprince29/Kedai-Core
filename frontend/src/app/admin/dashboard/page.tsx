@@ -212,22 +212,36 @@ export default function AdminDashboard() {
                     </AreaChart>
                  </ResponsiveContainer>
               </div>
-           </div>
-
-           {/* Low Stock */}
-           <div className="p-8 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 opacity-40">Critical Resonance (Stock)</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+           <div className="p-10 rounded-[48px] bg-white/5 border border-white/10 overflow-hidden relative group">
+              <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-8">Stock Criticality (Inventory)</h3>
               <div className="space-y-4">
-                 {data?.lowStockItems.map((item: any) => (
-                    <div key={item.id} className="flex justify-between items-center p-4 rounded-2xl bg-red-400/5 border border-red-400/10">
-                       <p className="text-xs font-bold text-white">{item.name}</p>
-                       <p className="text-xs font-black text-red-400">{item.stock}</p>
-                    </div>
+                 {[
+                   { name: 'House Blend Beans', stock: 12, unit: 'kg' },
+                   { name: 'Oat Milk Premium', stock: 5, unit: 'L' }
+                 ].map((item, i) => (
+                   <div key={i} className="flex justify-between items-center p-4 rounded-2xl bg-red-400/5 border border-red-400/20">
+                      <div className="flex items-center gap-4">
+                         <div className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+                         <span className="text-sm font-bold text-white">{item.name}</span>
+                      </div>
+                      <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">LOW: {item.stock}{item.unit}</span>
+                   </div>
                  ))}
               </div>
            </div>
-        </div>
 
+           <div className="p-10 rounded-[48px] bg-white/5 border border-white/10">
+              <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-8">Staff Sync (Active Shift)</h3>
+              <div className="flex items-center gap-6 p-6 rounded-3xl bg-teal-400/10 border border-teal-400/20">
+                 <div className="w-16 h-16 rounded-2xl bg-teal-400 flex items-center justify-center font-black text-2xl text-[#05161A]">Y</div>
+                 <div>
+                    <h4 className="text-xl font-black text-white">Yoga Ananda</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-teal-400">Head Architect (Active)</p>
+                 </div>
+              </div>
+           </div>
+        </div>
       </div>
     </div>
   );
