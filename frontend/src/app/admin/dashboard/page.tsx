@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { 
   TrendingUp, Users, ShoppingBag, AlertTriangle, 
-  ArrowUpRight, ArrowDownRight, Package, RefreshCcw
+  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, BarChart, Bar 
+  Tooltip, ResponsiveContainer
 } from 'recharts';
 import axios from 'axios';
 
@@ -19,6 +19,13 @@ const C = {
   text:    '#6DA5C0', // Sky Blue Text
   muted:   '#294D61', // Muted Blue
   border:  'rgba(15,150,156,0.1)'
+};
+
+const STATUS_COLORS: any = {
+  PENDING: '#6DA5C0',
+  PROCESSING: '#0F969C',
+  OUT_FOR_DELIVERY: '#F59E0B',
+  DONE: '#10B981'
 };
 
 export default function AdminDashboard() {
@@ -41,137 +48,158 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) return (
+  const updateStatus = async (id: string, newStatus: string) => {
+    try {
+      await axios.patch(`/api/transactions/${id}`, { status: newStatus });
+      fetchData();
+    } catch (err) {
+      alert('Failed to update status');
+    }
+  };
+
+  if (loading && !data) return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: C.bg }}>
       <RefreshCcw className="w-8 h-8 animate-spin text-teal-500" />
     </div>
   );
-
-  const stats = [
-    { label: 'Total Revenue', value: `Rp ${data?.totalRevenue.toLocaleString()}`, icon: TrendingUp, trend: '+12.5%', color: C.accent },
-    { label: 'Active Orders', value: data?.todayTransactionsCount || 0, icon: ShoppingBag, trend: '+4', color: '#6DA5C0' },
-    { label: 'Inventory Alerts', value: data?.inventoryAlertsCount || 0, icon: AlertTriangle, trend: 'Low Stock', color: '#EF4444' },
-  ];
 
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: C.bg }}>
       {/* ── HEADER ── */}
       <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter text-white mb-1">COMMAND CENTER</h1>
+          <h1 className="text-4xl font-black tracking-tighter text-white mb-1">COMMAND CENTER</h1>
           <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color: C.text }}>Artisan Insights v2.0</p>
         </div>
-        <button 
-          onClick={fetchData}
-          className="p-3 rounded-2xl border transition-all active:scale-95" 
-          style={{ backgroundColor: C.card, borderColor: C.border }}
-        >
-          <RefreshCcw className="w-5 h-5 text-teal-400" />
-        </button>
-      </div>
-
-      {/* ── STATS GRID ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {stats.map((s, i) => (
-          <div key={i} className="p-8 rounded-[32px] border transition-all hover:scale-[1.02]" style={{ backgroundColor: C.card, borderColor: C.border }}>
-            <div className="flex justify-between items-start mb-6">
-              <div className="p-3 rounded-2xl" style={{ backgroundColor: `${s.color}10` }}>
-                <s.icon className="w-6 h-6" style={{ color: s.color }} />
-              </div>
-              <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: s.color }}>
-                {s.trend}
-              </span>
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">{s.label}</p>
-            <h3 className="text-3xl font-black text-white">{s.value}</h3>
-          </div>
-        ))}
-      </div>
-
-      {/* ── CHARTS ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
-          <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Revenue Flow (7D)</h3>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data?.dailyTrend}>
-                <defs>
-                  <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={C.accent} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={C.accent} stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                <XAxis dataKey="date" hide />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: '16px' }}
-                  itemStyle={{ color: C.accent }}
-                />
-                <Area type="monotone" dataKey="amount" stroke={C.accent} strokeWidth={4} fillOpacity={1} fill="url(#colorAmt)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="flex gap-4">
+           <div className="text-right">
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Today's Revenue</p>
+              <p className="text-2xl font-black text-teal-400">Rp {data?.todayRevenue.toLocaleString()}</p>
+           </div>
+           <button 
+             onClick={fetchData}
+             className="p-4 rounded-2xl border transition-all active:scale-95 bg-white/5 border-white/5" 
+           >
+             <RefreshCcw className="w-5 h-5 text-teal-400" />
+           </button>
         </div>
+      </div>
 
-        <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
-          <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Stock Resonance</h3>
-          <div className="space-y-6">
-            {data?.lowStockItems.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-black/20 border border-white/5 overflow-hidden">
-                    <img src={item.image} className="w-full h-full object-cover" />
-                  </div>
+      {/* ── REVENUE COMPARISON ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+         <div className="p-8 rounded-[40px] border relative overflow-hidden" style={{ backgroundColor: C.card, borderColor: C.border }}>
+            <div className="relative z-10">
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mb-2">Today vs Yesterday</p>
+               <div className="flex items-end gap-6">
                   <div>
-                    <p className="text-sm font-bold text-white">{item.name}</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30">{item.category}</p>
+                     <p className="text-[10px] font-bold opacity-30 uppercase">Today</p>
+                     <h3 className="text-3xl font-black text-white">Rp {data?.todayRevenue.toLocaleString()}</h3>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs font-black text-red-400">{item.stock} left</p>
-                  <div className="w-24 h-1.5 bg-black/20 rounded-full mt-1 overflow-hidden">
-                    <div className="h-full bg-red-500" style={{ width: `${(item.stock / 20) * 100}%` }} />
+                  <div className="h-8 w-px bg-white/10" />
+                  <div>
+                     <p className="text-[10px] font-bold opacity-30 uppercase">Yesterday</p>
+                     <h3 className="text-xl font-black opacity-40">Rp {data?.yesterdayRevenue.toLocaleString()}</h3>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+               </div>
+            </div>
+            <TrendingUp className="absolute -bottom-10 -right-10 w-48 h-48 opacity-5 text-teal-400" />
+         </div>
+
+         <div className="p-8 rounded-[40px] border flex items-center justify-between" style={{ backgroundColor: C.card, borderColor: C.border }}>
+            <div>
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mb-2">Active Frequency</p>
+               <h3 className="text-4xl font-black text-white">{data?.todayTransactionsCount} <span className="text-sm opacity-30 font-medium">Orders Today</span></h3>
+            </div>
+            <div className="w-16 h-16 rounded-3xl flex items-center justify-center bg-teal-400/10 border border-teal-400/20">
+               <ShoppingBag className="w-8 h-8 text-teal-400" />
+            </div>
+         </div>
       </div>
 
-      {/* ── RECENT ACTIVITY ── */}
-      <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
-        <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Recent Echoes (Orders)</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-[10px] font-black uppercase tracking-widest opacity-30 border-b border-white/5">
-                <th className="pb-4">Transaction ID</th>
-                <th className="pb-4">Explorer Name</th>
-                <th className="pb-4">Essence Total</th>
-                <th className="pb-4">Frequency</th>
-                <th className="pb-4 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
+      {/* ── MAIN CONTENT GRID ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        {/* LEFT: Live Orders */}
+        <div className="xl:col-span-2 space-y-6">
+          <div className="p-8 rounded-[40px] border h-full" style={{ backgroundColor: C.card, borderColor: C.border }}>
+            <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40 flex items-center gap-3">
+               <Clock className="w-4 h-4" /> Live Echoes (Orders)
+            </h3>
+            
+            <div className="space-y-4">
               {data?.recentTransactions.map((t: any) => (
-                <tr key={t.id} className="text-sm">
-                  <td className="py-6 font-mono text-xs opacity-40">{t.id.slice(0, 8)}</td>
-                  <td className="py-6 font-bold text-white">{t.customerName}</td>
-                  <td className="py-6 text-teal-400 font-black">Rp {t.totalPrice.toLocaleString()}</td>
-                  <td className="py-6 opacity-40">{new Date(t.createdAt).toLocaleTimeString()}</td>
-                  <td className="py-6 text-right">
-                    <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" 
-                      style={{ backgroundColor: t.status === 'DONE' ? `${C.accent}20` : 'rgba(255,255,255,0.03)', color: t.status === 'DONE' ? C.accent : C.text }}>
-                      {t.status}
-                    </span>
-                  </td>
-                </tr>
+                <div key={t.id} className="p-6 rounded-3xl bg-black/20 border border-white/5 flex flex-col md:flex-row justify-between gap-6 transition-all hover:border-teal-400/20">
+                  <div className="flex gap-6">
+                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10 shrink-0">
+                        <Package className="w-6 h-6 opacity-30" />
+                     </div>
+                     <div>
+                        <div className="flex items-center gap-3 mb-1">
+                           <h4 className="font-black text-lg text-white">{t.customerName}</h4>
+                           <span className="text-[10px] font-mono opacity-30">#{t.id.slice(0,6)}</span>
+                        </div>
+                        <div className="flex gap-4">
+                           <p className="text-xs font-black text-teal-400">Rp {t.totalPrice.toLocaleString()}</p>
+                           <p className="text-xs opacity-40">{new Date(t.createdAt).toLocaleTimeString()}</p>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                     <select 
+                       value={t.status}
+                       onChange={(e) => updateStatus(t.id, e.target.value)}
+                       className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-teal-400 transition-all"
+                       style={{ color: STATUS_COLORS[t.status] }}
+                     >
+                        <option value="PENDING">Pending</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="OUT_FOR_DELIVERY">On Delivery</option>
+                        <option value="DONE">Completed</option>
+                     </select>
+                     
+                     <div className="flex gap-1">
+                        <button onClick={() => updateStatus(t.id, 'PROCESSING')} className="p-2 rounded-lg bg-white/5 hover:bg-teal-400/10 text-white/20 hover:text-teal-400 transition-all"><PlayCircle className="w-4 h-4" /></button>
+                        <button onClick={() => updateStatus(t.id, 'OUT_FOR_DELIVERY')} className="p-2 rounded-lg bg-white/5 hover:bg-orange-400/10 text-white/20 hover:text-orange-400 transition-all"><Truck className="w-4 h-4" /></button>
+                        <button onClick={() => updateStatus(t.id, 'DONE')} className="p-2 rounded-lg bg-white/5 hover:bg-green-400/10 text-white/20 hover:text-green-400 transition-all"><CheckCircle2 className="w-4 h-4" /></button>
+                     </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
+
+        {/* RIGHT: Insights */}
+        <div className="space-y-8">
+           {/* Revenue Chart */}
+           <div className="p-8 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 opacity-40">Velocity Trend</h3>
+              <div className="h-48">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={data?.dailyTrend}>
+                       <XAxis dataKey="date" hide />
+                       <YAxis hide />
+                       <Area type="monotone" dataKey="amount" stroke={C.accent} strokeWidth={3} fill={C.accent} fillOpacity={0.1} />
+                    </AreaChart>
+                 </ResponsiveContainer>
+              </div>
+           </div>
+
+           {/* Low Stock */}
+           <div className="p-8 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-8 opacity-40">Critical Resonance (Stock)</h3>
+              <div className="space-y-4">
+                 {data?.lowStockItems.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center p-4 rounded-2xl bg-red-400/5 border border-red-400/10">
+                       <p className="text-xs font-bold text-white">{item.name}</p>
+                       <p className="text-xs font-black text-red-400">{item.stock}</p>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+
       </div>
     </div>
   );

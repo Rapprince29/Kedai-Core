@@ -28,17 +28,42 @@ export default function MenuPage() {
   const { items: allMenuItems, fetchMenu, loading } = useMenuStore();
   const menuRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const [mounted,        setMounted]        = useState(false);
+  const [lastStatus,     setLastStatus]    = useState<string | null>(null);
+
+  const playNotifySound = () => {
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audio.play().catch(e => console.log('Sound blocked by browser policy'));
+  };
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [activeFlavor,   setActiveFlavor]   = useState('Semua');
   const [searchQuery,    setSearchQuery]     = useState('');
   const [searchFocused,  setSearchFocused]   = useState(false);
+  const [showFilters,    setShowFilters]    = useState(false);
   const [history,        setHistory]         = useState<string[]>([]);
+
+  const flavorOptions = useMemo(() => {
+    if (activeCategory === 'Coffee') return ['Semua', 'Manis', 'Pahit', 'Segar'];
+    if (activeCategory === 'Non-Coffee') return ['Semua', 'Manis', 'Segar'];
+    if (activeCategory === 'Pastry') return ['Semua', 'Manis', 'Gurih'];
+    return ['Semua', 'Manis', 'Pahit', 'Segar', 'Gurih'];
+  }, [activeCategory]);
 
   useEffect(() => { 
     setMounted(true);
     fetchMenu();
-  }, [fetchMenu]);
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get('/api/transactions/latest');
+        if (res.data && res.data.status !== lastStatus) {
+           if (lastStatus) playNotifySound();
+           setLastStatus(res.data.status);
+        }
+      } catch (err) {}
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [fetchMenu, lastStatus]);
 
   useEffect(() => {
     try {
@@ -187,25 +212,28 @@ export default function MenuPage() {
           ))}
         </div>
 
-        {/* ── FLAVOR FILTER (Dynamic Filtering) ── */}
+        {/* ── DYNAMIC FILTER PANEL ── */}
         <div className="flex items-center gap-3 py-1">
-          <div className="p-1.5 rounded-lg bg-teal-400/10 border border-teal-400/20">
-            <SlidersHorizontal className="w-3 h-3 text-teal-400" />
-          </div>
-          <div className="flex gap-2 overflow-x-auto scrollbar-none">
-            {FLAVORS.map(flavor => (
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`p-2.5 rounded-xl transition-all ${showFilters ? 'bg-teal-400 text-[#05161A]' : 'bg-teal-400/10 text-teal-400'} border border-teal-400/20`}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
+          
+          <div className="flex-grow flex gap-2 overflow-x-auto scrollbar-none py-1">
+            {showFilters && flavorOptions.map(flavor => (
               <button
                 key={flavor}
                 onClick={() => setActiveFlavor(flavor)}
-                className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${flavor === activeFlavor ? 'opacity-100' : 'opacity-40'}`}
-                style={{ 
-                  backgroundColor: flavor === activeFlavor ? `${C.terra}20` : 'transparent',
-                  color: flavor === activeFlavor ? C.terra : C.brown,
-                  border: `1px solid ${flavor === activeFlavor ? C.terra : 'transparent'}`
-                }}>
+                className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all animate-in slide-in-from-left-2 ${flavor === activeFlavor ? 'bg-teal-400 text-[#05161A]' : 'bg-white/5 text-white/40 border border-white/5'}`}
+              >
                 {flavor}
               </button>
             ))}
+            {!showFilters && (
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-20 py-2">Tap slider to refine flavor...</p>
+            )}
           </div>
         </div>
       </div>

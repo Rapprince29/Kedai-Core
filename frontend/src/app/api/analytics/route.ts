@@ -3,16 +3,26 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const orders: any[] = await (prisma as any).order.findMany({
+    const orders: any[] = await (prisma as any).transaction.findMany({
       orderBy: { createdAt: 'desc' }
     });
 
     const totalRevenue = orders.reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
     const todayOrders = orders.filter((t: any) => new Date(t.createdAt) >= today);
     const todayRevenue = todayOrders.reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
+
+    const yesterdayOrders = orders.filter((t: any) => {
+      const tDate = new Date(t.createdAt);
+      return tDate >= yesterday && tDate < today;
+    });
+    const yesterdayRevenue = yesterdayOrders.reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
 
     const menu: any[] = await (prisma as any).menu.findMany();
     const inventoryAlerts = menu.filter((item: any) => (Number(item.stock) || 0) < 10);
@@ -42,6 +52,7 @@ export async function GET() {
     return NextResponse.json({
       totalRevenue,
       todayRevenue,
+      yesterdayRevenue,
       totalTransactions: orders.length,
       todayTransactionsCount: todayOrders.length,
       inventoryAlertsCount: inventoryAlerts.length,

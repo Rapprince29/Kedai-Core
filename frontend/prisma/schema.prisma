@@ -34,6 +34,7 @@ model Menu {
   image        String
   stock        Int      @default(0)
   isBestSeller Boolean  @default(false)
+  ratings      Rating[]
   createdAt    DateTime @default(now())
 }
 
@@ -42,6 +43,17 @@ model Transaction {
   totalPrice   Float
   customerName String
   items        Json     
-  status       String   @default("PENDING") 
+  status       String   @default("PENDING") // PENDING, PROCESSING, OUT_FOR_DELIVERY, DONE
+  paymentProof String?
   createdAt    DateTime @default(now())
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  stars     Int      @default(5)
+  comment   String?
+  userId    String
+  menuId    Int
+  menu      Menu     @relation(fields: [menuId], references: [id])
+  createdAt DateTime @default(now())
 }
