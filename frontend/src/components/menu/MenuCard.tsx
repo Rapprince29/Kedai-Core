@@ -5,14 +5,14 @@ import { Plus, Minus, X, Info, Star } from 'lucide-react';
 import React, { forwardRef, useState } from 'react';
 
 const C = {
-  bg:      '#051F20', // Primary (Background)
-  white:   '#0B2B26', // Secondary
-  brown:   '#DAF1DE', // Highlights (Text)
-  terra:   '#8EB69B', // Soft Elements
-  accent:  '#235347', // Accent
-  muted:   '#8EB69B', // Text/Soft
-  warm:    '#163832', // Secondary dark
-  border:  'rgba(142,182,155,0.15)', // Soft green border
+  bg:      '#05161A', // Deep Sea Background
+  white:   '#072E33', // Deep Teal Card
+  brown:   '#6DA5C0', // Sky Blue Highlights
+  terra:   '#0F969C', // Teal Accent
+  accent:  '#0C7075', // Dark Teal CTA
+  muted:   '#294D61', // Muted Blue
+  warm:    '#05161A', // Background dark
+  border:  'rgba(15,150,156,0.15)', // Teal border
 };
 
 // ── Fallback images per category from Unsplash ────────────────────────────────
@@ -62,27 +62,27 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
       <div
         ref={ref}
         onClick={() => setShowModal(true)}
-        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-md cursor-pointer active:scale-[0.98] ${isBest ? 'scale-[1.02]' : ''}`}
+        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer active:scale-[0.98] ${isBest ? 'scale-[1.02]' : ''}`}
         style={{
           backgroundColor: C.white,
           border: isBest ? `1px solid ${C.terra}60` : `1px solid ${C.border}`,
-          boxShadow: isBest ? `0 8px 32px ${C.terra}15` : `0 4px 20px rgba(0,0,0,0.2)`,
+          boxShadow: isBest ? `0 8px 32px ${C.terra}15` : `0 4px 20px rgba(0,0,0,0.3)`,
         }}
       >
         <div
           className="w-[90px] h-[90px] rounded-[16px] overflow-hidden shrink-0 relative"
-          style={{ backgroundColor: C.warm }}
+          style={{ backgroundColor: C.bg }}
         >
           {isBest && (
-            <div className="absolute top-0 left-0 z-10 p-1 rounded-br-lg" style={{ backgroundColor: C.terra }}>
-              <Star className="w-3 h-3 text-[#051F20] fill-[#051F20]" />
+            <div className="absolute top-0 left-0 z-10 p-1.5 rounded-br-lg" style={{ backgroundColor: C.terra }}>
+              <Star className="w-3 h-3 text-[#05161A] fill-[#05161A]" />
             </div>
           )}
           <img
             src={imgSrc}
             alt={item.name}
             className="w-full h-full object-cover"
-            style={{ transition: 'transform 0.35s ease' }}
+            style={{ transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}
             onError={() => {
               const fb = getFallback(item.category, item.id);
               if (imgSrc !== fb) setImgSrc(fb);
@@ -93,23 +93,28 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
         <div className="flex-grow flex flex-col justify-between min-w-0">
           <div className="relative">
             {isBest && (
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] mb-1 block" style={{ color: C.terra }}>
-                Best Seller
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] mb-1 block" style={{ color: C.terra }}>
+                Artisan Pick
               </span>
             )}
             <h3
-              className="font-bold text-base italic leading-snug"
-              style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}
+              className="font-bold text-base tracking-tight leading-snug"
+              style={{ color: '#fff', fontFamily: "'DM Sans', sans-serif" }}
             >
               {item.name}
             </h3>
-            <p
-              className="text-[10px] font-semibold mt-0.5 tracking-widest uppercase"
-              style={{ color: `${C.muted}80` }}
-            >
-              {item.category}
-            </p>
-            <p className="text-sm font-bold mt-1" style={{ color: C.terra }}>
+            <div className="flex items-center gap-2 mt-0.5">
+               <p className="text-[9px] font-bold tracking-widest uppercase opacity-40" style={{ color: C.brown }}>
+                {item.category}
+              </p>
+              {item.flavor && (
+                <span className="text-[8px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-tighter" 
+                  style={{ backgroundColor: `${C.terra}20`, color: C.terra }}>
+                  {item.flavor}
+                </span>
+              )}
+            </div>
+            <p className="text-sm font-black mt-2" style={{ color: C.terra }}>
               Rp {item.price.toLocaleString('id-ID')}
             </p>
           </div>
@@ -118,87 +123,89 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
             {cartItem ? (
               <div
                 className="flex items-center gap-4 px-3 py-1.5 rounded-full"
-                style={{ backgroundColor: C.accent, border: `1px solid ${C.terra}40` }}
+                style={{ backgroundColor: C.accent, border: `1px solid ${C.terra}30` }}
               >
-                <button onClick={(e) => handleUpdate(e, -1)} className="transition-transform active:scale-90">
-                  <Minus className="w-3.5 h-3.5" style={{ color: C.brown }} />
+                <button onClick={(e) => handleUpdate(e, -1)} className="transition-transform active:scale-75">
+                  <Minus className="w-3.5 h-3.5 text-white" />
                 </button>
-                <span className="text-sm font-black w-4 text-center" style={{ color: C.brown }}>
+                <span className="text-sm font-black w-4 text-center text-white">
                   {cartItem.quantity}
                 </span>
-                <button onClick={(e) => handleUpdate(e, 1)} className="transition-transform active:scale-90">
-                  <Plus className="w-3.5 h-3.5" style={{ color: C.brown }} />
+                <button onClick={(e) => handleUpdate(e, 1)} className="transition-transform active:scale-75">
+                  <Plus className="w-3.5 h-3.5 text-white" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={handleAdd}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 text-white"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 text-white"
                 style={{ backgroundColor: C.accent, boxShadow: `0 4px 16px ${C.accent}40` }}
               >
                 <Plus className="w-3.5 h-3.5" />
-                Order
+                Add
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Ingredient Transparency Modal ── */}
+      {/* ── Immersive Modal ── */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
           <div 
-            className="relative w-full max-w-md rounded-[32px] overflow-hidden animate-in zoom-in-95 duration-300"
+            className="relative w-full max-w-lg rounded-t-[40px] md:rounded-[40px] overflow-hidden animate-in slide-in-from-bottom-10 duration-400"
             style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}
           >
             <button 
               onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 text-white backdrop-blur-md"
+              className="absolute top-6 right-6 z-10 p-3 rounded-full bg-black/40 text-white backdrop-blur-xl border border-white/10"
             >
               <X className="w-5 h-5" />
             </button>
             
-            <div className="h-64 w-full relative">
-              {isBest && (
-                <div className="absolute top-4 left-4 z-10 px-4 py-2 rounded-full flex items-center gap-2" style={{ backgroundColor: `${C.terra}E6` }}>
-                  <Star className="w-4 h-4 text-[#051F20] fill-[#051F20]" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#051F20]">Artisan Top Pick</span>
-                </div>
-              )}
+            <div className="h-72 w-full relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#072E33] to-transparent z-1" />
               <img src={imgSrc} alt={item.name} className="w-full h-full object-cover" />
             </div>
             
-            <div className="p-8">
-              <div className="flex justify-between items-start mb-4">
+            <div className="p-10 -mt-10 relative z-10">
+              <div className="flex justify-between items-end mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold italic" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>
+                  <h2 className="text-4xl font-black tracking-tighter text-white">
                     {item.name}
                   </h2>
-                  <p className="text-xs tracking-widest uppercase font-semibold mt-1" style={{ color: C.terra }}>
-                    {item.category}
-                  </p>
+                  <div className="flex gap-3 mt-2">
+                    <span className="text-[10px] tracking-[0.2em] uppercase font-black px-3 py-1 rounded-full" 
+                      style={{ backgroundColor: `${C.terra}20`, color: C.terra }}>
+                      {item.category}
+                    </span>
+                    {item.flavor && (
+                      <span className="text-[10px] tracking-[0.2em] uppercase font-black px-3 py-1 rounded-full" 
+                        style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: C.brown }}>
+                        {item.flavor}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold" style={{ color: C.brown }}>Rp {item.price.toLocaleString('id-ID')}</p>
-                </div>
+                <p className="text-3xl font-black" style={{ color: C.terra }}>Rp {item.price.toLocaleString('id-ID')}</p>
               </div>
               
-              <div className="p-4 rounded-2xl mb-6" style={{ backgroundColor: C.warm, border: `1px solid ${C.border}` }}>
-                <div className="flex items-center gap-2 mb-2">
+              <div className="p-6 rounded-[24px] mb-10" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}` }}>
+                <div className="flex items-center gap-3 mb-3">
                   <Info className="w-4 h-4" style={{ color: C.terra }} />
-                  <span className="text-[10px] uppercase font-bold tracking-widest" style={{ color: C.muted }}>Ingredients & Info</span>
+                  <span className="text-[10px] uppercase font-black tracking-[0.3em]" style={{ color: C.brown }}>Description</span>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: C.brown }}>
-                  {item.description || 'Our artisan creation made with premium ingredients and seasonal inspiration.'}
+                <p className="text-sm leading-relaxed opacity-70 text-white font-medium">
+                  {item.description || 'A masterpiece of deep sea flavors, crafted for the ultimate sensory experience.'}
                 </p>
               </div>
               
               <button
                 onClick={(e) => { handleAdd(e); setShowModal(false); }}
-                className="w-full py-4 rounded-full font-bold text-sm tracking-[0.2em] uppercase text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-5 rounded-full font-black text-xs tracking-[0.3em] uppercase text-white transition-all hover:brightness-110 active:scale-[0.98]"
                 style={{ backgroundColor: C.accent, boxShadow: `0 12px 32px ${C.accent}40` }}
               >
-                Add to Cart
+                Confirm to Order
               </button>
             </div>
           </div>

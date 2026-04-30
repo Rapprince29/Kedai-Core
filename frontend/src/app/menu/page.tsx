@@ -4,34 +4,23 @@ import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useMenuStore } from '@/store/menuStore';
 import { useCartStore } from '@/store/cartStore';
-import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Sparkles, Sun, Moon, Coffee } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, Filter } from 'lucide-react';
 import Link from 'next/link';
 import MenuCard from '@/components/menu/MenuCard';
 
 const C = {
-  bg:      '#051F20', // Primary (Background)
-  white:   '#0B2B26', // Secondary
-  brown:   '#DAF1DE', // Highlights (Text)
-  terra:   '#8EB69B', // Soft Elements
-  accent:  '#235347', // Accent
-  muted:   '#8EB69B', // Text/Soft
-  sand:    '#163832', // Secondary dark
-  warm:    '#163832', // Secondary dark
-  border:  'rgba(142,182,155,0.15)', // Soft green border
+  bg:      '#05161A', // Deep Sea Background
+  white:   '#072E33', // Deep Teal Card
+  brown:   '#6DA5C0', // Sky Blue Highlights
+  terra:   '#0F969C', // Teal Accent
+  accent:  '#0C7075', // Dark Teal CTA
+  muted:   '#294D61', // Muted Blue
+  border:  'rgba(15,150,156,0.15)', // Teal border
 };
 
 const CATEGORIES = ['Semua', 'Coffee', 'Pastry', 'Non-Coffee'];
-const HISTORY_KEY = 'kedai_search_history';
-const MAX_HISTORY = 6;
-
-function CoffeeBean({ size = 28, color = '#A0522D', opacity = 1 }: { size?: number; color?: string; opacity?: number }) {
-  return (
-    <svg width={size} height={size * 0.65} viewBox="0 0 60 39" fill="none" style={{ opacity }}>
-      <ellipse cx="30" cy="19.5" rx="30" ry="19.5" fill={color} />
-      <path d="M30 4 Q30 19.5 30 35" stroke="#6B4226" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-    </svg>
-  );
-}
+const FLAVORS = ['Semua', 'Manis', 'Pahit', 'Segar'];
+const HISTORY_KEY = 'kedai_search_history_v2';
 
 export default function MenuPage() {
   const { getTotalPrice, getTotalItems } = useCartStore();
@@ -40,15 +29,14 @@ export default function MenuPage() {
 
   const [mounted,        setMounted]        = useState(false);
   const [activeCategory, setActiveCategory] = useState('Semua');
+  const [activeFlavor,   setActiveFlavor]   = useState('Semua');
   const [searchQuery,    setSearchQuery]     = useState('');
   const [searchFocused,  setSearchFocused]   = useState(false);
   const [history,        setHistory]         = useState<string[]>([]);
-  const [currentTime,    setCurrentTime]     = useState(new Date().getHours());
 
   useEffect(() => { 
     setMounted(true);
     fetchMenu();
-    setCurrentTime(new Date().getHours());
   }, [fetchMenu]);
 
   useEffect(() => {
@@ -60,87 +48,64 @@ export default function MenuPage() {
 
   const saveHistory = (q: string) => {
     if (!q.trim()) return;
-    const next = [q, ...history.filter(h => h !== q)].slice(0, MAX_HISTORY);
+    const next = [q, ...history.filter(h => h !== q)].slice(0, 5);
     setHistory(next);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
   };
-
-  const deleteHistory = (item: string) => {
-    const next = history.filter(h => h !== item);
-    setHistory(next);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
-  };
-
-  const clearAllHistory = () => { setHistory([]); localStorage.removeItem(HISTORY_KEY); };
-  const applyHistory    = (q: string) => { setSearchQuery(q); setSearchFocused(false); };
 
   const [debouncedQuery, setDebouncedQuery] = useState('');
-
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400); // Doherty Threshold
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const sourceItems = mounted ? allMenuItems : [];
-
   const filteredMenu = useMemo(() =>
-    sourceItems.filter(item => {
+    allMenuItems.filter(item => {
       const matchCat   = activeCategory === 'Semua' || item.category === activeCategory;
+      const matchFlavor = activeFlavor === 'Semua' || item.flavor === activeFlavor;
       const matchQuery = item.name.toLowerCase().includes(debouncedQuery.toLowerCase());
-      return matchCat && matchQuery;
-    }), [activeCategory, debouncedQuery, sourceItems]);
-
-  const smartFilter = useMemo(() => {
-    if (currentTime >= 6 && currentTime < 11) return { label: 'Morning Vibes', sub: 'Try our artisan coffee', icon: <Coffee className="w-3.5 h-3.5" />, category: 'Coffee' };
-    if (currentTime >= 15 && currentTime < 19) return { label: 'Afternoon Chill', sub: 'Perfect with pastries', icon: <Sparkles className="w-3.5 h-3.5" />, category: 'Pastry' };
-    return null;
-  }, [currentTime]);
+      return matchCat && matchFlavor && matchQuery;
+    }), [activeCategory, activeFlavor, debouncedQuery, allMenuItems]);
 
   useLayoutEffect(() => {
     const targets = menuRefs.current.filter(Boolean);
     if (!targets.length) return;
     gsap.fromTo(targets,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.3, stagger: 0.03, ease: 'power2.out', clearProps: 'transform,opacity' }
+      { y: 30, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.05, ease: 'back.out(1.2)', clearProps: 'all' }
     );
   }, [filteredMenu]);
 
-  const showDropdown = searchFocused && history.length > 0 && !searchQuery;
-
   return (
-    <div className="min-h-screen pb-36" style={{ backgroundColor: C.bg }}>
+    <div className="min-h-screen pb-36 text-white" style={{ backgroundColor: C.bg }}>
 
-      {/* ── HEADER ── */}
+      {/* ── IMMERSIVE HEADER ── */}
       <header
-        className="sticky top-0 z-50 backdrop-blur-xl px-5 py-4 flex justify-between items-center"
-        style={{ backgroundColor: `${C.bg}F2`, borderBottom: `1px solid ${C.border}` }}
+        className="sticky top-0 z-50 backdrop-blur-3xl px-6 py-5 flex justify-between items-center"
+        style={{ borderBottom: `1px solid ${C.border}` }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Link href="/"
-            className="p-2 rounded-full transition-all hover:brightness-95"
-            style={{ backgroundColor: C.warm, border: `1px solid ${C.border}` }}>
-            <ArrowLeft className="w-5 h-5" style={{ color: C.muted }} />
+            className="p-2.5 rounded-2xl transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1
-              className="text-xl font-bold italic tracking-tight leading-none"
-              style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}
-            >
-              Kedai Code
-            </h1>
-            <p className="text-[9px] tracking-[0.25em] uppercase font-semibold" style={{ color: C.muted }}>
-              Artisan Forest Menu
-            </p>
+            <h1 className="text-xl font-black tracking-tighter">KEDAI CODE</h1>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">System Active</p>
+            </div>
           </div>
         </div>
 
         <Link href="/cart"
-          className="relative p-2.5 rounded-full"
-          style={{ backgroundColor: C.warm, border: `1px solid ${C.border}` }}>
-          <ShoppingCart className="w-5 h-5" style={{ color: C.brown }} />
+          className="relative p-3 rounded-2xl transition-all hover:scale-105 active:scale-95"
+          style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
+          <ShoppingCart className="w-5 h-5" style={{ color: C.terra }} />
           {getTotalItems() > 0 && (
             <span
-              className="absolute -top-1 -right-1 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full text-white"
+              className="absolute -top-1 -right-1 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full text-[#05161A]"
               style={{ backgroundColor: C.terra }}>
               {getTotalItems()}
             </span>
@@ -148,207 +113,142 @@ export default function MenuPage() {
         </Link>
       </header>
 
-      {/* ── HERO STRIP ── */}
-      <div
-        className="mx-5 mt-5 mb-4 rounded-[20px] overflow-hidden relative"
-        style={{ height: '120px', backgroundColor: C.warm }}
-      >
-        <img
-          src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=70&fit=crop"
-          alt="Coffee"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.35 }}
-        />
-        <div className="float-a absolute top-3 right-16 pointer-events-none">
-          <CoffeeBean size={28} color={C.terra} opacity={0.8} />
-        </div>
-        <div className="float-b absolute bottom-4 right-8 pointer-events-none">
-          <CoffeeBean size={20} color={C.accent} opacity={0.6} />
-        </div>
-        <div className="absolute inset-0 flex flex-col justify-center px-6">
-          <p className="text-[10px] tracking-[0.4em] uppercase font-semibold mb-0.5" style={{ color: C.muted }}>
-            Our Artisan Collection
-          </p>
-          <h2
-            className="text-2xl font-bold italic leading-tight"
-            style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}
-          >
-            Savor the Moment
-          </h2>
+      {/* ── HERO HEADER ── */}
+      <div className="px-6 mt-8 mb-6">
+        <div className="relative h-48 rounded-[32px] overflow-hidden group">
+          <img
+            src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&q=80&fit=crop"
+            alt="Hero"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#05161A] via-[#05161A]/80 to-transparent p-8 flex flex-col justify-center">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-4 h-4 text-teal-400" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-teal-400">Deep Sea Offer</span>
+            </div>
+            <h2 className="text-3xl font-black tracking-tighter leading-none mb-3">
+              CRAFTED BY<br/>CODE & WATER
+            </h2>
+            <p className="text-xs font-medium opacity-60 tracking-wider">Experience the depth of artisan flavors.</p>
+          </div>
         </div>
       </div>
 
-      {/* ── SMART FILTER SUGGESTION ── */}
-      {smartFilter && !searchQuery && (
-        <div className="px-5 mb-4 animate-in slide-in-from-top-4 duration-500">
-          <button 
-            onClick={() => setActiveCategory(smartFilter.category)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl border transition-all hover:scale-[1.01] active:scale-[0.99]"
-            style={{ backgroundColor: `${C.terra}15`, borderColor: `${C.terra}30` }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl" style={{ backgroundColor: C.terra, color: C.bg }}>
-                {smartFilter.icon}
-              </div>
-              <div className="text-left">
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: C.terra }}>{smartFilter.label}</p>
-                <p className="text-xs font-medium" style={{ color: C.brown }}>{smartFilter.sub}</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4" style={{ color: C.terra }} />
-          </button>
-        </div>
-      )}
-
-      {/* ── SEARCH ── */}
-      <div className="px-5 pb-2 relative">
+      {/* ── SEARCH & FILTER ── */}
+      <div className="px-6 space-y-4">
         <div
-          className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all"
+          className="flex items-center gap-4 px-5 py-4 rounded-3xl transition-all"
           style={{
             backgroundColor: C.white,
-            border: `1.5px solid ${searchFocused ? C.terra : C.border}`,
-            boxShadow: searchFocused ? `0 0 0 3px ${C.terra}12` : `0 2px 12px rgba(107,66,38,0.06)`,
+            border: `1px solid ${searchFocused ? C.terra : C.border}`,
+            boxShadow: searchFocused ? `0 0 40px ${C.terra}15` : 'none',
           }}>
-          <Search className="w-4 h-4 shrink-0" style={{ color: searchFocused ? C.terra : C.muted }} />
+          <Search className="w-5 h-5 shrink-0" style={{ color: searchFocused ? C.terra : C.muted }} />
           <input
             type="text"
-            placeholder="Search artisan menu..."
+            placeholder="Search flavor depth..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
-            onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+            onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
             onKeyDown={e => { if (e.key === 'Enter') saveHistory(searchQuery); }}
-            className="flex-grow bg-transparent outline-none text-sm"
-            style={{ color: C.brown, caretColor: C.terra }}
+            className="flex-grow bg-transparent outline-none text-sm font-medium placeholder:opacity-30"
           />
-          {searchQuery &&
-            <button onClick={() => setSearchQuery('')}>
-              <X className="w-4 h-4" style={{ color: C.muted }} />
-            </button>
-          }
+          {searchQuery && <X className="w-4 h-4 cursor-pointer" onClick={() => setSearchQuery('')} />}
         </div>
 
-        {/* ── SEARCH HISTORY DROPDOWN ── */}
-        {showDropdown && (
-          <div
-            className="absolute left-5 right-5 mt-2 rounded-2xl z-40 overflow-hidden"
-            style={{
-              backgroundColor: C.white,
-              border: `1px solid ${C.border}`,
-              boxShadow: `0 20px 60px rgba(0,0,0,0.5)`,
-            }}>
-            <div className="flex justify-between items-center px-4 pt-3 pb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: C.muted }}>
-                Recent
-              </span>
-              <button onClick={clearAllHistory} className="text-[10px] font-bold" style={{ color: C.terra }}>
-                Clear All
-              </button>
-            </div>
-            {history.map(item => (
-              <div
-                key={item}
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white/5 transition-all"
-                style={{ borderTop: `1px solid ${C.border}` }}>
-                <Clock className="w-3.5 h-3.5 shrink-0" style={{ color: C.muted }} />
-                <span className="flex-grow text-sm font-medium" style={{ color: C.brown }} onClick={() => applyHistory(item)}>
-                  {item}
-                </span>
-                <button onClick={() => deleteHistory(item)}>
-                  <X className="w-3 h-3" style={{ color: C.muted }} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── CATEGORY TABS ── */}
-      <div className="flex gap-2 px-5 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-        {CATEGORIES.map(cat => {
-          const isActive = cat === activeCategory;
-          return (
+        {/* ── CATEGORY SCROLL ── */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+          {CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className="px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase whitespace-nowrap transition-all"
+              className="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all"
               style={
-                isActive
-                  ? { backgroundColor: C.terra, color: C.bg, boxShadow: `0 6px 20px ${C.terra}30` }
-                  : { backgroundColor: C.white, color: C.muted, border: `1px solid ${C.border}` }
+                cat === activeCategory
+                  ? { backgroundColor: C.terra, color: C.bg }
+                  : { backgroundColor: C.white, color: C.brown, border: `1px solid ${C.border}` }
               }>
               {cat}
             </button>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* ── FLAVOR FILTER (Dynamic Filtering) ── */}
+        <div className="flex items-center gap-3 py-1">
+          <Filter className="w-3.5 h-3.5 opacity-40" />
+          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+            {FLAVORS.map(flavor => (
+              <button
+                key={flavor}
+                onClick={() => setActiveFlavor(flavor)}
+                className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${flavor === activeFlavor ? 'opacity-100' : 'opacity-40'}`}
+                style={{ 
+                  backgroundColor: flavor === activeFlavor ? `${C.terra}20` : 'transparent',
+                  color: flavor === activeFlavor ? C.terra : C.brown,
+                  border: `1px solid ${flavor === activeFlavor ? C.terra : 'transparent'}`
+                }}>
+                {flavor}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* ── COUNT LABEL ── */}
-      <div className="px-5 pb-3">
-        <p className="text-[11px] tracking-widest uppercase font-semibold" style={{ color: `${C.muted}80` }}>
-          {filteredMenu.length} Creations
-          {searchQuery ? ` · "${searchQuery}"` : ''}
-        </p>
-      </div>
+      {/* ── MENU GRID ── */}
+      <div className="px-6 mt-8 flex flex-col gap-4">
+        <div className="flex justify-between items-end mb-2">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Available Essence</p>
+          <span className="text-[10px] font-black text-teal-400">{filteredMenu.length} items</span>
+        </div>
 
-      {/* ── MENU LIST ── */}
-      <div className="px-5 flex flex-col gap-3">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24">
-            <div className="w-10 h-10 border-4 border-t-transparent animate-spin rounded-full" style={{ borderColor: `${C.terra}40`, borderTopColor: C.terra }}></div>
-            <p className="mt-4 text-sm font-semibold tracking-widest uppercase" style={{ color: C.muted }}>Syncing Forest flavors...</p>
+          <div className="py-24 text-center">
+            <Waves className="w-10 h-10 mx-auto animate-bounce text-teal-400 opacity-20" />
+            <p className="mt-4 text-[10px] font-black uppercase tracking-[0.5em] opacity-30">Syncing with Deep Sea...</p>
           </div>
         ) : filteredMenu.length > 0 ? (
-          filteredMenu.map((item, index) => (
-            <MenuCard
-              key={item.id}
-              item={item}
-              ref={(el) => { menuRefs.current[index] = el; }}
-            />
-          ))
+          <div className="grid grid-cols-1 gap-4">
+            {filteredMenu.map((item, index) => (
+              <MenuCard
+                key={item.id}
+                item={item}
+                ref={(el) => { menuRefs.current[index] = el; }}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: C.warm }}>
-              <Search className="w-7 h-7" style={{ color: C.muted }} />
-            </div>
-            <p
-              className="font-bold text-lg italic"
-              style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}
-            >
-              Creation not found
-            </p>
-            <p className="text-sm mt-1 mb-5" style={{ color: C.muted }}>Try another forest flavor</p>
-            <button
-              onClick={() => { setSearchQuery(''); setActiveCategory('Semua'); }}
-              className="px-6 py-2.5 rounded-full text-sm font-semibold text-white"
-              style={{ backgroundColor: C.terra, color: C.bg, boxShadow: `0 8px 24px ${C.terra}30` }}>
-              Reset Essence
-            </button>
+          <div className="py-24 text-center opacity-40">
+             <Search className="w-12 h-12 mx-auto mb-4" />
+             <p className="text-sm font-black italic">No flavors found in this depth.</p>
           </div>
         )}
       </div>
 
-      {/* ── FLOATING CART BAR ── */}
+      {/* ── STICKY CHECKOUT (Fitts's Law) ── */}
       {getTotalItems() > 0 && (
-        <div className="fixed bottom-8 left-5 right-5 z-50">
+        <div className="fixed bottom-10 left-6 right-6 z-50">
           <Link href="/cart">
             <div
-              className="p-4 rounded-2xl flex justify-between items-center"
+              className="p-5 rounded-[28px] flex justify-between items-center transition-all hover:brightness-110 active:scale-95"
               style={{
                 backgroundColor: C.terra,
-                boxShadow: `0 20px 60px ${C.terra}45`,
+                boxShadow: `0 20px 60px ${C.terra}40`,
               }}>
-              <div className="flex items-center gap-3">
-                <div className="px-3 py-1 rounded-lg text-xs font-black" style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: C.bg }}>
-                  {getTotalItems()} Item
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/10">
+                   <ShoppingCart className="w-5 h-5 text-[#05161A]" />
                 </div>
-                <span className="font-semibold" style={{ color: C.bg }}>View Forest Cart</span>
+                <div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-[#05161A]/60">Proceed to Depth</p>
+                   <span className="font-black text-[#05161A]">{getTotalItems()} Item Selected</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-base font-black" style={{ color: C.bg }}>
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-black text-[#05161A]">
                   Rp {getTotalPrice().toLocaleString('id-ID')}
                 </span>
-                <ChevronRight className="w-5 h-5" style={{ color: `${C.bg}70` }} />
+                <ChevronRight className="w-6 h-6 text-[#05161A]/40" />
               </div>
             </div>
           </Link>
