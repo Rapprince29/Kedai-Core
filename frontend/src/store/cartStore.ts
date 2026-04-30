@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 
 export interface MenuItem {
-  id: string;
+  id: string | number;
   name: string;
+  description?: string;
   price: number;
   image: string;
   category: string;
+  stock?: number;
 }
 
 export interface CartItem extends MenuItem {
@@ -15,8 +17,8 @@ export interface CartItem extends MenuItem {
 interface CartState {
   items: CartItem[];
   addItem: (item: MenuItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, delta: number) => void;
+  removeItem: (id: string | number) => void;
+  updateQuantity: (id: string | number, delta: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;

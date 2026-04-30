@@ -7,14 +7,14 @@ import { useRouter } from 'next/navigation';
 import CartItemComponent from '@/components/cart/CartItem';
 
 const C = {
-  bg:      '#F2F0EB',
-  white:   '#FFFFFF',
-  brown:   '#1C1007',
-  terra:   '#A0522D',
-  accent:  '#6B4226',
-  muted:   '#8C7B6B',
-  warm:    '#E8DFD0',
-  border:  'rgba(107,66,38,0.10)',
+  bg:      '#051F20', // Primary (Background)
+  white:   '#0B2B26', // Secondary
+  brown:   '#DAF1DE', // Highlights (Text)
+  terra:   '#8EB69B', // Soft Elements
+  accent:  '#235347', // Accent
+  muted:   '#8EB69B', // Text/Soft
+  warm:    '#163832', // Secondary dark
+  border:  'rgba(142,182,155,0.15)', // Soft green border
 };
 
 export default function CartPage() {

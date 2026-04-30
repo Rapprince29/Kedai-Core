@@ -5,32 +5,31 @@ import { useMenuStore } from '@/store/menuStore';
 import { MenuItem } from '@/store/cartStore';
 import {
   Plus, Pencil, Trash2, X, Check, ShieldAlert,
-  UtensilsCrossed, ChevronLeft, ImageIcon
+  ChevronLeft, ImageIcon, Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 
 const C = {
-  bg:      '#F2F0EB',
-  card:    '#FFFFFF',
-  card2:   '#E8DFD0',
-  primary: '#A0522D',
-  accent:  '#6B4226',
-  text:    '#1C1007',
-  muted:   '#8C7B6B',
-  green:   '#3a7d44',
-  red:     '#dc2626',
-  border:  'rgba(107,66,38,0.10)',
+  bg:      '#051F20', // Primary (Background)
+  card:    '#0B2B26', // Secondary
+  card2:   '#163832', // Secondary dark
+  primary: '#8EB69B', // Soft Elements (Accent)
+  accent:  '#235347', // Accent
+  text:    '#DAF1DE', // Highlights (Text)
+  muted:   '#8EB69B', // Text/Soft
+  green:   '#DAF1DE',
+  red:     '#ff6b6b',
+  border:  'rgba(142,182,155,0.15)',
 };
 
-const CATEGORIES = ['Mie', 'Dimsum', 'Minuman'];
+const CATEGORIES = ['Coffee', 'Pastry', 'Non-Coffee'];
 
-const EMPTY_FORM = { name: '', price: '', category: 'Mie', image: '' };
+const EMPTY_FORM = { name: '', description: '', price: '', category: 'Coffee', image: '', stock: '0' };
 
-// ─── Simple PIN guard ─────────────────────────────────────────────────────────
-const ADMIN_PIN = '1234'; // TODO: ganti dengan env var / auth asli
+const ADMIN_PIN = '1234';
 
 export default function AdminPage() {
-  const { items, addItem, updateItem, deleteItem, isDefault } = useMenuStore();
+  const { items, fetchMenu, addItem, updateItem, deleteItem, loading } = useMenuStore();
 
   const [authed,    setAuthed]    = useState(false);
   const [pin,       setPin]       = useState('');
@@ -40,13 +39,17 @@ export default function AdminPage() {
   const [target,    setTarget]    = useState<MenuItem | null>(null);
   const [form,      setForm]      = useState(EMPTY_FORM);
   const [toast,     setToast]     = useState('');
+  const [busy,      setBusy]      = useState(false);
+
+  useEffect(() => {
+    if (authed) fetchMenu();
+  }, [authed, fetchMenu]);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
   };
 
-  // ─── PIN LOGIN ──────────────────────────────────────────────────────────────
   if (!authed) {
     const handlePinSubmit = (e?: React.FormEvent) => {
       if (e) e.preventDefault();
@@ -57,287 +60,246 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8"
         style={{ backgroundColor: C.bg }}>
-        <div className="w-16 h-16 rounded-[20px] flex items-center justify-center mb-6"
-          style={{ backgroundColor: C.card, boxShadow: '0 4px 20px rgba(107,66,38,0.08)' }}>
-          <ShieldAlert className="w-8 h-8" style={{ color: C.primary }} />
+        <div className="w-20 h-20 rounded-[24px] flex items-center justify-center mb-6"
+          style={{ backgroundColor: C.card, boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+          <ShieldAlert className="w-10 h-10" style={{ color: C.primary }} />
         </div>
-        <h1 className="text-2xl font-bold italic mb-1" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>Admin Panel</h1>
-        <p className="text-sm mb-8" style={{ color: C.muted }}>Masukkan PIN untuk lanjut</p>
+        <h1 className="text-3xl font-bold italic mb-1" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>Kedai-Code Admin</h1>
+        <p className="text-sm mb-8" style={{ color: C.muted }}>Enter PIN to access the artisan dashboard</p>
 
-        <form onSubmit={handlePinSubmit} className="flex flex-col items-center gap-0">
+        <form onSubmit={handlePinSubmit} className="flex flex-col items-center">
           <input
             type="password"
-            maxLength={6}
+            maxLength={4}
             value={pin}
             onChange={e => { setPin(e.target.value); setPinError(false); }}
-            placeholder="• • • •"
-            className="w-40 text-center text-3xl tracking-[0.5em] py-4 rounded-2xl outline-none"
+            placeholder="••••"
+            className="w-48 text-center text-4xl tracking-[0.6em] py-5 rounded-2xl outline-none transition-all"
             style={{
               border: `2px solid ${pinError ? C.red : C.border}`,
               color: C.text,
               backgroundColor: C.card,
-              boxShadow: '0 4px 20px rgba(107,66,38,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
             }}
             autoFocus
           />
-          {pinError && (
-            <p className="text-xs mt-3 font-bold" style={{ color: C.red }}>PIN salah, coba lagi</p>
-          )}
+          {pinError && <p className="text-xs mt-3 font-bold" style={{ color: C.red }}>Invalid PIN</p>}
           <button
             type="submit"
-            className="mt-5 px-8 py-3 rounded-full font-semibold text-white transition-all hover:brightness-90 active:scale-95"
-            style={{ backgroundColor: C.primary, boxShadow: `0 8px 24px ${C.primary}35` }}
+            className="mt-8 px-12 py-4 rounded-full font-bold text-sm uppercase tracking-widest text-white transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: C.accent, boxShadow: `0 12px 32px ${C.accent}40` }}
           >
-            Masuk
+            Authenticate
           </button>
         </form>
-        <Link href="/" className="mt-6 text-xs" style={{ color: `${C.muted}80` }}>
-          ← Kembali ke Beranda
+        <Link href="/" className="mt-10 text-xs tracking-widest uppercase font-bold opacity-60 hover:opacity-100 transition-opacity" style={{ color: C.muted }}>
+          ← Back to Menu
         </Link>
       </div>
     );
   }
 
-  // ─── OPEN MODAL ─────────────────────────────────────────────────────────────
-  const openAdd = () => {
-    setForm(EMPTY_FORM);
-    setTarget(null);
-    setModal('add');
-  };
-
-  const openEdit = (item: MenuItem) => {
+  const openAdd = () => { setForm(EMPTY_FORM); setTarget(null); setModal('add'); };
+  const openEdit = (item: any) => {
     setTarget(item);
-    setForm({ name: item.name, price: String(item.price), category: item.category, image: item.image });
+    setForm({ 
+      name: item.name, 
+      description: item.description || '', 
+      price: String(item.price), 
+      category: item.category, 
+      image: item.image,
+      stock: String(item.stock || 0)
+    });
     setModal('edit');
   };
+  const openDelete = (item: any) => { setTarget(item); setModal('delete'); };
+  const closeModal = () => { if (!busy) { setModal(null); setTarget(null); } };
 
-  const openDelete = (item: MenuItem) => { setTarget(item); setModal('delete'); };
-
-  const closeModal = () => { setModal(null); setTarget(null); };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.price || !form.image.trim()) return;
-    const data = { name: form.name.trim(), price: Number(form.price), category: form.category, image: form.image.trim() };
-    if (modal === 'add') {
-      addItem(data);
-      showToast('✅ Menu berhasil ditambahkan!');
-    } else if (modal === 'edit' && target) {
-      updateItem(target.id, data);
-      showToast('✏️ Menu berhasil diperbarui!');
+    setBusy(true);
+    try {
+      const data = { 
+        name: form.name.trim(), 
+        description: form.description.trim(),
+        price: Number(form.price), 
+        category: form.category, 
+        image: form.image.trim(),
+        stock: Number(form.stock)
+      };
+      if (modal === 'add') {
+        await addItem(data);
+        showToast('✅ Menu added successfully!');
+      } else if (modal === 'edit' && target) {
+        await updateItem(target.id, data);
+        showToast('✏️ Menu updated!');
+      }
+      closeModal();
+    } catch (err) {
+      showToast('❌ Failed to save menu');
+    } finally {
+      setBusy(false);
     }
-    closeModal();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!target) return;
-    deleteItem(target.id);
-    showToast('🗑️ Menu berhasil dihapus!');
-    closeModal();
+    setBusy(true);
+    try {
+      await deleteItem(target.id);
+      showToast('🗑️ Menu deleted!');
+      closeModal();
+    } catch (err) {
+      showToast('❌ Failed to delete');
+    } finally {
+      setBusy(false);
+    }
   };
 
-  // ─── MAIN DASHBOARD ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen pb-24" style={{ backgroundColor: C.bg }}>
-
-      {/* Toast */}
       {toast && (
-        <div
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-sm font-bold shadow-2xl transition-all"
-          style={{ backgroundColor: C.card, color: C.text, border: `1px solid ${C.border}` }}
-        >
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-sm font-bold shadow-2xl animate-in slide-in-from-top-4"
+          style={{ backgroundColor: C.primary, color: C.bg }}>
           {toast}
         </div>
       )}
 
-      {/* Header */}
-      <header
-        className="sticky top-0 z-50 backdrop-blur-md px-5 py-4 flex justify-between items-center"
-        style={{ backgroundColor: `${C.bg}E0`, borderBottom: `1px solid ${C.border}` }}
-      >
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 rounded-full" style={{ backgroundColor: C.card }}>
-            <ChevronLeft className="w-5 h-5" style={{ color: C.accent }} />
+      <header className="sticky top-0 z-50 backdrop-blur-xl px-5 py-6 flex justify-between items-center"
+        style={{ backgroundColor: `${C.bg}CC`, borderBottom: `1px solid ${C.border}` }}>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="p-2.5 rounded-full transition-all hover:scale-110" style={{ backgroundColor: C.card }}>
+            <ChevronLeft className="w-5 h-5" style={{ color: C.text }} />
           </Link>
           <div>
-            <h1 className="text-xl font-bold italic" style={{ color: C.primary, fontFamily: "'Cormorant Garamond', serif" }}>Admin Panel</h1>
-            <p className="text-[9px] uppercase tracking-widest" style={{ color: C.muted }}>
-              {items.length} item terdaftar
+            <h1 className="text-2xl font-bold italic" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>Artisan Studio</h1>
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold" style={{ color: C.muted }}>
+              {items.length} Crafted Items
             </p>
           </div>
         </div>
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white"
-          style={{ backgroundColor: C.primary, boxShadow: `0 6px 20px ${C.primary}40` }}
-        >
+        <button onClick={openAdd} className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white transition-all hover:scale-105 active:scale-95"
+          style={{ backgroundColor: C.accent, boxShadow: `0 8px 24px ${C.accent}40` }}>
           <Plus className="w-4 h-4" />
-          Tambah
+          Craft New
         </button>
       </header>
 
-      {/* Category Sections */}
-      {CATEGORIES.map(cat => {
-        const catItems = items.filter(i => i.category === cat);
-        return (
-          <div key={cat} className="px-5 pt-6">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: C.muted }}>
-              {cat} ({catItems.length})
-            </p>
-            <div className="flex flex-col gap-3">
-              {catItems.map(item => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 p-4 rounded-2xl"
-                  style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
-                >
-                  {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0" style={{ backgroundColor: C.card2 }}>
-                    {item.image
-                      ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                      : <ImageIcon className="w-6 h-6 m-auto mt-5" style={{ color: C.accent }} />
-                    }
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-grow min-w-0">
-                    <p className="font-semibold italic truncate" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</p>
-                    <p className="text-sm font-semibold mt-0.5" style={{ color: C.primary }}>
-                      Rp {item.price.toLocaleString('id-ID')}
-                    </p>
-                    {!isDefault(item.id) && (
-                      <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mt-1 inline-block"
-                        style={{ backgroundColor: `${C.primary}20`, color: C.primary }}>
-                        Custom
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => openEdit(item)}
-                      className="p-2 rounded-xl transition-all hover:brightness-125"
-                      style={{ backgroundColor: C.card2 }}
-                    >
-                      <Pencil className="w-4 h-4" style={{ color: C.accent }} />
-                    </button>
-                    <button
-                      onClick={() => openDelete(item)}
-                      className="p-2 rounded-xl transition-all hover:brightness-125"
-                      style={{ backgroundColor: `${C.red}15` }}
-                    >
-                      <Trash2 className="w-4 h-4" style={{ color: C.red }} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {catItems.length === 0 && (
-                <p className="text-sm py-4 text-center" style={{ color: `${C.muted}80` }}>
-                  Belum ada menu kategori {cat}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-40">
+          <Loader2 className="w-10 h-10 animate-spin" style={{ color: C.primary }} />
+          <p className="mt-4 text-xs font-bold uppercase tracking-widest" style={{ color: C.muted }}>Loading Studio...</p>
+        </div>
+      ) : (
+        CATEGORIES.map(cat => {
+          const catItems = items.filter(i => i.category === cat);
+          return (
+            <div key={cat} className="px-5 pt-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px flex-grow" style={{ backgroundColor: C.border }} />
+                <p className="text-[11px] font-bold uppercase tracking-[0.4em]" style={{ color: C.muted }}>
+                  {cat} ({catItems.length})
                 </p>
-              )}
+                <div className="h-px flex-grow" style={{ backgroundColor: C.border }} />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {catItems.map(item => (
+                  <div key={item.id} className="flex items-center gap-4 p-5 rounded-[24px] transition-all hover:shadow-xl"
+                    style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}>
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0" style={{ backgroundColor: C.card2 }}>
+                      {item.image
+                        ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        : <ImageIcon className="w-8 h-8 m-auto mt-6" style={{ color: C.accent }} />
+                      }
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <p className="text-lg font-bold italic truncate" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</p>
+                      <p className="text-sm font-bold mt-1" style={{ color: C.primary }}>
+                        Rp {item.price.toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <button onClick={() => openEdit(item)} className="p-3 rounded-xl transition-all hover:bg-white/10" style={{ backgroundColor: C.card2 }}>
+                        <Pencil className="w-4 h-4" style={{ color: C.text }} />
+                      </button>
+                      <button onClick={() => openDelete(item)} className="p-3 rounded-xl transition-all hover:bg-red-500/20" style={{ backgroundColor: 'rgba(255,107,107,0.1)' }}>
+                        <Trash2 className="w-4 h-4" style={{ color: C.red }} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
 
       {/* ── MODAL ADD / EDIT ── */}
       {(modal === 'add' || modal === 'edit') && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
-          onClick={closeModal}>
-          <div
-            className="w-full max-w-lg rounded-t-[32px] p-6 pb-10"
-            style={{ backgroundColor: C.card }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold italic" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>
-                {modal === 'add' ? '+ Tambah Menu' : '✏ Edit Menu'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={closeModal}>
+          <div className="w-full max-w-xl rounded-[40px] p-8 max-h-[90vh] overflow-y-auto animate-in zoom-in-95"
+            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold italic" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>
+                {modal === 'add' ? 'Craft New Menu' : 'Refine Menu Item'}
               </h2>
-              <button onClick={closeModal}><X className="w-5 h-5" style={{ color: C.muted }} /></button>
+              <button onClick={closeModal} className="p-2 rounded-full hover:bg-white/10"><X className="w-6 h-6" style={{ color: C.text }} /></button>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {/* Nama */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-widest mb-1 block" style={{ color: C.muted }}>
-                  Nama Menu
-                </label>
-                <input
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="contoh: Mie Pedas Level 10"
-                  className="w-full px-4 py-3 rounded-xl outline-none text-sm"
-                  style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
-                />
-              </div>
-
-              {/* Harga */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-widest mb-1 block" style={{ color: C.muted }}>
-                  Harga (Rp)
-                </label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                  placeholder="contoh: 15000"
-                  className="w-full px-4 py-3 rounded-xl outline-none text-sm"
-                  style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
-                />
-              </div>
-
-              {/* Kategori */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-widest mb-1 block" style={{ color: C.muted }}>
-                  Kategori
-                </label>
-                <div className="flex gap-2">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setForm(f => ({ ...f, category: cat }))}
-                      className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
-                      style={
-                        form.category === cat
-                          ? { backgroundColor: C.primary, color: '#fff' }
-                          : { backgroundColor: C.bg, color: C.accent, border: `1px solid ${C.border}` }
-                      }
-                    >
-                      {cat}
-                    </button>
-                  ))}
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Item Name</label>
+                  <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    className="w-full px-5 py-4 rounded-2xl outline-none text-sm transition-all focus:ring-2"
+                    style={{ backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}`, '--tw-ring-color': C.primary } as any} />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Description</label>
+                  <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    className="w-full px-5 py-4 rounded-2xl outline-none text-sm min-h-[100px]"
+                    style={{ backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}` }} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Price (Rp)</label>
+                    <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                      className="w-full px-5 py-4 rounded-2xl outline-none text-sm"
+                      style={{ backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}` }} />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Initial Stock</label>
+                    <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
+                      className="w-full px-5 py-4 rounded-2xl outline-none text-sm"
+                      style={{ backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}` }} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Category</label>
+                  <div className="flex gap-2">
+                    {CATEGORIES.map(cat => (
+                      <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))}
+                        className="flex-1 py-3 rounded-xl text-xs font-bold transition-all"
+                        style={form.category === cat ? { backgroundColor: C.primary, color: C.bg } : { backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}` }}>
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Image URL</label>
+                  <input value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                    className="w-full px-5 py-4 rounded-2xl outline-none text-sm"
+                    style={{ backgroundColor: C.card2, color: C.text, border: `1px solid ${C.border}` }} />
                 </div>
               </div>
-
-              {/* URL Gambar */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-widest mb-1 block" style={{ color: C.muted }}>
-                  URL Gambar
-                </label>
-                <input
-                  value={form.image}
-                  onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                  placeholder="https://..."
-                  className="w-full px-4 py-3 rounded-xl outline-none text-sm"
-                  style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
-                />
-                {form.image && (
-                  <img src={form.image} alt="preview" className="w-full h-32 object-cover rounded-xl mt-2"
-                    onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                )}
-              </div>
             </div>
 
-            <button
-              onClick={handleSave}
-              disabled={!form.name || !form.price || !form.image}
-              className="mt-6 w-full py-4 rounded-2xl font-black text-white text-base flex items-center justify-center gap-2 disabled:opacity-40"
-              style={{ backgroundColor: C.primary }}
-            >
-              <Check className="w-5 h-5" />
-              {modal === 'add' ? 'Tambahkan Menu' : 'Simpan Perubahan'}
+            <button onClick={handleSave} disabled={busy || !form.name || !form.price || !form.image}
+              className="mt-10 w-full py-5 rounded-[24px] font-bold text-white flex items-center justify-center gap-3 disabled:opacity-40 transition-all hover:scale-[1.02]"
+              style={{ backgroundColor: C.accent, boxShadow: `0 12px 32px ${C.accent}40` }}>
+              {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+              {modal === 'add' ? 'Confirm Craft' : 'Save Refinements'}
             </button>
           </div>
         </div>
@@ -345,31 +307,23 @@ export default function AdminPage() {
 
       {/* ── MODAL DELETE ── */}
       {modal === 'delete' && target && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
-          onClick={closeModal}>
-          <div
-            className="w-full max-w-sm rounded-[32px] p-8 text-center"
-            style={{ backgroundColor: C.card }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-              style={{ backgroundColor: `${C.red}15` }}>
-              <Trash2 className="w-8 h-8" style={{ color: C.red }} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={closeModal}>
+          <div className="w-full max-w-sm rounded-[40px] p-10 text-center animate-in zoom-in-95"
+            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: 'rgba(255,107,107,0.1)' }}>
+              <Trash2 className="w-10 h-10" style={{ color: C.red }} />
             </div>
-            <h2 className="text-xl font-bold italic mb-2" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>Hapus Menu?</h2>
-            <p className="text-sm mb-6" style={{ color: C.muted }}>
-              <span style={{ color: C.text, fontWeight: 700 }}>{target.name}</span> akan dihapus dari daftar menu.
+            <h2 className="text-2xl font-bold italic mb-3" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>Archive Menu?</h2>
+            <p className="text-sm mb-8" style={{ color: C.muted }}>
+              The creation <span style={{ color: C.text, fontWeight: 700 }}>{target.name}</span> will be removed from the artisan collection.
             </p>
-            <div className="flex gap-3">
-              <button onClick={closeModal}
-                className="flex-1 py-3 rounded-xl font-bold text-sm"
-                style={{ backgroundColor: C.bg, color: C.accent }}>
-                Batal
+            <div className="flex gap-4">
+              <button onClick={closeModal} className="flex-1 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all hover:bg-white/10" style={{ color: C.text }}>
+                Cancel
               </button>
-              <button onClick={handleDelete}
-                className="flex-1 py-3 rounded-xl font-bold text-sm text-white"
-                style={{ backgroundColor: C.red }}>
-                Hapus
+              <button onClick={handleDelete} disabled={busy} className="flex-1 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-white transition-all hover:scale-105"
+                style={{ backgroundColor: C.red, boxShadow: `0 8px 24px ${C.red}30` }}>
+                {busy ? 'Archiving...' : 'Confirm'}
               </button>
             </div>
           </div>

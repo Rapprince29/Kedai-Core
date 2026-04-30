@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Menu {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  category    String
+  image       String
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  totalPrice   Float
+  customerName String
+  items        Json     // Menyimpan array produk yang dibeli
+  status       String   @default("PENDING") // PENDING, COOKING, DONE
+  createdAt    DateTime @default(now())
+}

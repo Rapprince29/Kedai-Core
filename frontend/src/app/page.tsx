@@ -7,60 +7,60 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import Preloader from '@/components/Preloader';
 
 const C = {
-  bg:     '#F2F0EB',
-  white:  '#FFFFFF',
-  brown:  '#1C1007',
-  terra:  '#A0522D',
-  accent: '#6B4226',
-  muted:  '#8C7B6B',
-  sand:   '#DDD0BE',
-  warm:   '#E8DFD0',
+  bg:     '#051F20', // Primary (Background)
+  white:  '#0B2B26', // Secondary
+  brown:  '#DAF1DE', // Highlights (Text)
+  terra:  '#8EB69B', // Soft Elements
+  accent: '#235347', // Accent
+  muted:  '#8EB69B', // Text/Soft
+  sand:   '#163832', // Secondary dark
+  warm:   '#163832', // Secondary dark
 };
 
 const COFFEES = [
   {
-    name: 'Macchiato',
-    tag: 'Espresso · Milk Foam',
-    desc: 'Coffee macchiato — a bold espresso drink layered with a small dollop of steamed milk foam for a rich, indulgent finish.',
+    name: 'Forest Espresso',
+    tag: 'Bold · Deep · Aromatic',
+    desc: 'A dark, intense shot with notes of cedar and cocoa, perfectly captured for the modern artisan.',
     price: 'Rp 28.000',
-    accentColor: '#C8894A',
-    bgTint: '#EDE0D0',
+    accentColor: '#8EB69B',
+    bgTint: '#0B2B26',
     img: 'https://images.unsplash.com/photo-1485808191679-5f86510bd9d4?w=800&q=85&fit=crop',
   },
   {
-    name: 'Cappuccino',
-    tag: 'Espresso · Steamed Milk',
-    desc: 'A classic Italian coffee — double espresso, hot milk, and velvety steamed foam in perfect harmony.',
+    name: 'Mint Cream Latte',
+    tag: 'Smooth · Minty · Fresh',
+    desc: 'Our signature latte infused with fresh mint and topped with a velvety cream foam.',
     price: 'Rp 32.000',
-    accentColor: '#9B6B3A',
-    bgTint: '#E8D8C6',
+    accentColor: '#DAF1DE',
+    bgTint: '#163832',
     img: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=800&q=85&fit=crop',
   },
   {
-    name: 'Cold Brew',
-    tag: 'Cold · Smooth · 18h Steep',
-    desc: 'Steeped for 18 hours in cold water — smooth, naturally sweet, with remarkably low acidity.',
+    name: 'Moss Cold Brew',
+    tag: 'Cold · Earthy · Smooth',
+    desc: 'Slow-steeped for 18 hours to bring out the deep, earthy tones of our specialty beans.',
     price: 'Rp 35.000',
-    accentColor: '#5C4033',
-    bgTint: '#DDD0C4',
+    accentColor: '#235347',
+    bgTint: '#0B2B26',
     img: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800&q=85&fit=crop',
   },
   {
-    name: 'Flat White',
-    tag: 'Ristretto · Velvety',
-    desc: 'Ristretto-based espresso with a thin, velvety layer of microfoam — strong, smooth, and perfectly balanced.',
+    name: 'Artisan Flat White',
+    tag: 'Balanced · Velvety',
+    desc: 'A perfectly balanced ratio of ristretto and microfoam, creating a smooth, artisan experience.',
     price: 'Rp 30.000',
-    accentColor: '#8B5E3C',
-    bgTint: '#E6D4C2',
+    accentColor: '#8EB69B',
+    bgTint: '#163832',
     img: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?w=800&q=85&fit=crop',
   },
   {
-    name: 'Pour Over',
-    tag: 'Filter · Single Origin',
-    desc: 'Hand-crafted pour over that reveals the natural floral and fruity notes of our single-origin specialty beans.',
+    name: 'Cedar Pour Over',
+    tag: 'Floral · Complex',
+    desc: 'Hand-crafted filter coffee that reveals delicate floral and woody notes.',
     price: 'Rp 38.000',
-    accentColor: '#7A5230',
-    bgTint: '#E2D4C0',
+    accentColor: '#DAF1DE',
+    bgTint: '#0B2B26',
     img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=85&fit=crop',
   },
 ];

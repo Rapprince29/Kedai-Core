@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 /* ─── Palette ─────────────────────────────────────────────────────────────── */
-const TERRA = '#A0522D';
-const BROWN = '#1C1007';
-const MUTED = '#8C7B6B';
-const WARM  = '#E8DFD0';
+const TERRA = '#8EB69B'; // Accent/Soft
+const BROWN = '#051F20'; // Primary
+const MUTED = '#DAF1DE'; // Highlights
+const WARM  = '#163832'; // Secondary dark
 
 /* ─── SVG Bean ────────────────────────────────────────────────────────────── */
 function Bean({ size = 36, color = TERRA, op = 1, rot = 0 }: {
@@ -113,7 +113,7 @@ export default function Preloader({ onDone }: { onDone?: () => void }) {
     <div
       ref={wrapRef}
       className="fixed inset-0 z-[9999] overflow-hidden"
-      style={{ backgroundColor: '#F2F0EB' }}
+      style={{ backgroundColor: BROWN }}
     >
       {/* ── Full-screen coffee photo behind everything ── */}
       <div
@@ -125,11 +125,11 @@ export default function Preloader({ onDone }: { onDone?: () => void }) {
           src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=85&fit=crop"
           alt="Coffee"
           className="w-full h-full object-cover"
-          style={{ filter: 'saturate(1.1) brightness(0.88)' }}
+          style={{ filter: 'saturate(0.8) brightness(0.7) contrast(1.1)' }}
         />
-        {/* Warm cream overlay so text stays readable */}
+        {/* Deep forest overlay */}
         <div className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(28,16,7,0.65) 0%, rgba(28,16,7,0.10) 55%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(to top, rgba(5,31,32,0.85) 0%, rgba(5,31,32,0.20) 55%, transparent 100%)' }}
         />
       </div>
 
@@ -137,13 +137,13 @@ export default function Preloader({ onDone }: { onDone?: () => void }) {
       <div
         ref={topPanelRef}
         className="absolute top-0 left-0 w-full h-1/2 pointer-events-none"
-        style={{ backgroundColor: '#F2F0EB', zIndex: 10 }}
+        style={{ backgroundColor: BROWN, zIndex: 10 }}
       />
       {/* ── BOTTOM split panel (flies down on exit) ── */}
       <div
         ref={btmPanelRef}
         className="absolute bottom-0 left-0 w-full h-1/2 pointer-events-none"
-        style={{ backgroundColor: '#F2F0EB', zIndex: 10 }}
+        style={{ backgroundColor: BROWN, zIndex: 10 }}
       />
 
       {/* ── Floating beans (above photo, below panels) ── */}
@@ -178,7 +178,7 @@ export default function Preloader({ onDone }: { onDone?: () => void }) {
                 textShadow: '0 2px 20px rgba(0,0,0,0.4)',
               }}
             >
-              Kedai&nbsp;<span style={{ color: '#E8A87C' }}>Code</span>
+              Kedai&nbsp;<span style={{ color: TERRA }}>Code</span>
             </span>
           </div>
         </div>
@@ -187,21 +187,21 @@ export default function Preloader({ onDone }: { onDone?: () => void }) {
         <p
           ref={subRef}
           className="text-[12px] tracking-[0.5em] uppercase font-semibold mt-4 mb-8"
-          style={{ color: 'rgba(255,255,255,0.70)', fontFamily: "'DM Sans', sans-serif" }}
+          style={{ color: 'rgba(142,182,155,0.70)', fontFamily: "'DM Sans', sans-serif" }}
         >
-          Coffee Flavours
+          Modern Forest Menu
         </p>
 
         {/* Progress bar */}
         <div
           ref={barTrackRef}
           className="w-40 h-[2px] rounded-full overflow-hidden"
-          style={{ backgroundColor: 'rgba(255,255,255,0.20)' }}
+          style={{ backgroundColor: 'rgba(255,255,255,0.10)' }}
         >
           <div
             ref={barFillRef}
             className="h-full rounded-full"
-            style={{ backgroundColor: '#E8A87C' }}
+            style={{ backgroundColor: TERRA }}
           />
         </div>
       </div>

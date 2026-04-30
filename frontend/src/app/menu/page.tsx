@@ -9,18 +9,18 @@ import Link from 'next/link';
 import MenuCard from '@/components/menu/MenuCard';
 
 const C = {
-  bg:      '#F2F0EB',
-  white:   '#FFFFFF',
-  brown:   '#1C1007',
-  terra:   '#A0522D',
-  accent:  '#6B4226',
-  muted:   '#8C7B6B',
-  sand:    '#DDD0BE',
-  warm:    '#E8DFD0',
-  border:  'rgba(107,66,38,0.10)',
+  bg:      '#051F20', // Primary (Background)
+  white:   '#0B2B26', // Secondary
+  brown:   '#DAF1DE', // Highlights (Text)
+  terra:   '#8EB69B', // Soft Elements
+  accent:  '#235347', // Accent
+  muted:   '#8EB69B', // Text/Soft
+  sand:    '#163832', // Secondary dark
+  warm:    '#163832', // Secondary dark
+  border:  'rgba(142,182,155,0.15)', // Soft green border
 };
 
-const CATEGORIES = ['Semua', 'Mie', 'Dimsum', 'Minuman'];
+const CATEGORIES = ['Semua', 'Coffee', 'Pastry', 'Non-Coffee'];
 const HISTORY_KEY = 'kedai_search_history';
 const MAX_HISTORY = 6;
 
@@ -35,7 +35,7 @@ function CoffeeBean({ size = 28, color = '#A0522D', opacity = 1 }: { size?: numb
 
 export default function MenuPage() {
   const { getTotalPrice, getTotalItems } = useCartStore();
-  const allMenuItems = useMenuStore(s => s.items);
+  const { items: allMenuItems, fetchMenu, loading } = useMenuStore();
   const menuRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const [mounted,        setMounted]        = useState(false);
@@ -44,7 +44,10 @@ export default function MenuPage() {
   const [searchFocused,  setSearchFocused]   = useState(false);
   const [history,        setHistory]         = useState<string[]>([]);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { 
+    setMounted(true);
+    fetchMenu();
+  }, [fetchMenu]);
 
   useEffect(() => {
     try {
@@ -69,14 +72,21 @@ export default function MenuPage() {
   const clearAllHistory = () => { setHistory([]); localStorage.removeItem(HISTORY_KEY); };
   const applyHistory    = (q: string) => { setSearchQuery(q); setSearchFocused(false); };
 
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const sourceItems = mounted ? allMenuItems : [];
 
   const filteredMenu = useMemo(() =>
     sourceItems.filter(item => {
       const matchCat   = activeCategory === 'Semua' || item.category === activeCategory;
-      const matchQuery = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchQuery = item.name.toLowerCase().includes(debouncedQuery.toLowerCase());
       return matchCat && matchQuery;
-    }), [activeCategory, searchQuery, sourceItems]);
+    }), [activeCategory, debouncedQuery, sourceItems]);
 
   useLayoutEffect(() => {
     const targets = menuRefs.current.filter(Boolean);
@@ -259,7 +269,12 @@ export default function MenuPage() {
 
       {/* ── MENU LIST ── */}
       <div className="px-5 flex flex-col gap-3">
-        {filteredMenu.length > 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="w-10 h-10 border-4 border-t-transparent animate-spin rounded-full" style={{ borderColor: `${C.terra}40`, borderTopColor: C.terra }}></div>
+            <p className="mt-4 text-sm font-semibold tracking-widest uppercase" style={{ color: C.muted }}>Memuat Menu...</p>
+          </div>
+        ) : filteredMenu.length > 0 ? (
           filteredMenu.map((item, index) => (
             <MenuCard
               key={item.id}
