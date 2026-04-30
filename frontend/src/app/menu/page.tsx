@@ -129,8 +129,10 @@ export default function MenuPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={async () => {
-              await axios.post('/api/auth/logout');
-              window.location.href = '/auth/login';
+              if (window.confirm('Are you sure you want to exit the Deep Sea?')) {
+                await axios.post('/api/auth/logout');
+                window.location.href = '/auth/login';
+              }
             }}
             className="p-2 md:p-2.5 rounded-xl md:rounded-2xl transition-all hover:scale-105 active:scale-95 opacity-40 hover:opacity-100"
             style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>

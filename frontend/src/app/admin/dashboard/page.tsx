@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { 
   TrendingUp, Users, ShoppingBag, AlertTriangle, 
-  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle, Package
+  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle, Package, LogOut
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer
 } from 'recharts';
+import Link from 'next/link';
 import axios from 'axios';
 
 const C = {
@@ -71,8 +72,12 @@ export default function AdminDashboard() {
           <h1 className="text-4xl font-black tracking-tighter text-white mb-1">COMMAND CENTER</h1>
           <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color: C.text }}>Artisan Insights v2.0</p>
         </div>
-        <div className="flex gap-4">
-           <div className="text-right">
+        <div className="flex gap-4 items-center">
+           <Link href="/admin/users" className="hidden md:flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-teal-400/10 hover:border-teal-400/30 transition-all group">
+             <Users className="w-4 h-4 text-teal-400" />
+             <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-teal-400">Users</span>
+           </Link>
+           <div className="text-right mr-4">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Today's Revenue</p>
               <p className="text-2xl font-black text-teal-400">Rp {data?.todayRevenue.toLocaleString()}</p>
            </div>
@@ -81,6 +86,17 @@ export default function AdminDashboard() {
              className="p-4 rounded-2xl border transition-all active:scale-95 bg-white/5 border-white/5" 
            >
              <RefreshCcw className="w-5 h-5 text-teal-400" />
+           </button>
+           <button 
+             onClick={async () => {
+               if (window.confirm('Abandon Command Center?')) {
+                 await axios.post('/api/auth/logout');
+                 window.location.href = '/auth/login';
+               }
+             }}
+             className="p-4 rounded-2xl border transition-all active:scale-95 bg-red-400/10 border-red-400/20" 
+           >
+             <LogOut className="w-5 h-5 text-red-400" />
            </button>
         </div>
       </div>
