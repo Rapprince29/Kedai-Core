@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useMenuStore } from '@/store/menuStore';
 import { useCartStore } from '@/store/cartStore';
-import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, Filter } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import MenuCard from '@/components/menu/MenuCard';
 import axios from 'axios';
@@ -189,7 +189,9 @@ export default function MenuPage() {
 
         {/* ── FLAVOR FILTER (Dynamic Filtering) ── */}
         <div className="flex items-center gap-3 py-1">
-          <Filter className="w-3.5 h-3.5 opacity-40" />
+          <div className="p-1.5 rounded-lg bg-teal-400/10 border border-teal-400/20">
+            <SlidersHorizontal className="w-3 h-3 text-teal-400" />
+          </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-none">
             {FLAVORS.map(flavor => (
               <button

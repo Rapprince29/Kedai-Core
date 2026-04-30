@@ -62,7 +62,7 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
       <div
         ref={ref}
         onClick={() => setShowModal(true)}
-        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer active:scale-[0.98] ${isBest ? 'scale-[1.02]' : ''}`}
+        className={`flex gap-4 p-4 rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer active:scale-[0.98] h-[120px] ${isBest ? 'scale-[1.02]' : ''}`}
         style={{
           backgroundColor: C.white,
           border: isBest ? `1px solid ${C.terra}60` : `1px solid ${C.border}`,
@@ -90,13 +90,15 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
           />
         </div>
 
-        <div className="flex-grow flex flex-col justify-center min-w-0">
+        <div className="flex-grow flex flex-col justify-center min-w-0 h-full">
           <div className="relative">
-            {isBest && (
-              <span className="text-[8px] font-black uppercase tracking-[0.3em] mb-1 block" style={{ color: C.terra }}>
-                Artisan Pick
-              </span>
-            )}
+            <div className="h-4"> {/* Spacer for tag consistency */}
+              {isBest && (
+                <span className="text-[8px] font-black uppercase tracking-[0.3em] mb-1 block" style={{ color: C.terra }}>
+                  Artisan Pick
+                </span>
+              )}
+            </div>
             <h3
               className="font-bold text-base tracking-tight leading-snug truncate"
               style={{ color: '#fff', fontFamily: "'DM Sans', sans-serif" }}
