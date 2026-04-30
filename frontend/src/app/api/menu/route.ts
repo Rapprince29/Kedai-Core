@@ -9,12 +9,17 @@ export async function GET() {
     })
     const flattened = menus.map((m: any) => ({
       ...m,
-      category: m.category?.name || 'Uncategorized'
+      category: m.category?.name || 'Uncategorized',
+      price: Number(m.price) || 0,
+      stock: Number(m.stock) || 0
     }))
     return NextResponse.json(flattened)
   } catch (error) {
     console.error('Failed to fetch menu:', error)
-    return NextResponse.json({ error: 'Failed to fetch menu' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to fetch menu',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }
 
@@ -22,6 +27,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
+    if (!body.category) {
+      return NextResponse.json({ error: 'Category is required' }, { status: 400 })
+    }
+
     let category = await (prisma as any).category.findUnique({
       where: { name: body.category }
     })
@@ -36,11 +45,12 @@ export async function POST(request: NextRequest) {
       data: {
         name: body.name,
         description: body.description || '',
-        price: Number(body.price),
+        price: Number(body.price) || 0,
         categoryId: category.id,
-        image: body.image,
-        stock: Number(body.stock || 0),
+        image: body.image || '',
+        stock: Number(body.stock) || 0,
         isBestSeller: body.isBestSeller || false,
+        flavor: body.flavor || null
       },
       include: { category: true }
     })
@@ -48,6 +58,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ...menu, category: menu.category?.name })
   } catch (error) {
     console.error('Failed to create menu:', error)
-    return NextResponse.json({ error: 'Failed to create menu' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to create menu',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }

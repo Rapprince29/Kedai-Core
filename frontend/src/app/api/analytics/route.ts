@@ -7,15 +7,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
 
-    const totalRevenue = orders.reduce((acc: number, t: any) => acc + t.totalPrice, 0);
+    const totalRevenue = orders.reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     const todayOrders = orders.filter((t: any) => new Date(t.createdAt) >= today);
-    const todayRevenue = todayOrders.reduce((acc: number, t: any) => acc + t.totalPrice, 0);
+    const todayRevenue = todayOrders.reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
 
     const menu: any[] = await (prisma as any).menu.findMany();
-    const inventoryAlerts = menu.filter((item: any) => item.stock < 10);
+    const inventoryAlerts = menu.filter((item: any) => (Number(item.stock) || 0) < 10);
 
     // Group transactions by day for the last 7 days
     const dailyTrend = [];
@@ -31,7 +31,7 @@ export async function GET() {
           const tDate = new Date(t.createdAt);
           return tDate >= d && tDate < nextD;
         })
-        .reduce((acc: number, t: any) => acc + t.totalPrice, 0);
+        .reduce((acc: number, t: any) => acc + (Number(t.totalPrice) || 0), 0);
 
       dailyTrend.push({
         date: d.toISOString().split('T')[0],
@@ -46,11 +46,17 @@ export async function GET() {
       todayTransactionsCount: todayOrders.length,
       inventoryAlertsCount: inventoryAlerts.length,
       dailyTrend,
-      recentTransactions: orders.slice(0, 5),
-      lowStockItems: inventoryAlerts.slice(0, 5)
+      recentTransactions: orders.slice(0, 10).map(t => ({
+        ...t,
+        totalPrice: Number(t.totalPrice) || 0
+      })),
+      lowStockItems: inventoryAlerts.slice(0, 10)
     });
   } catch (error) {
     console.error('Failed to fetch analytics:', error);
-    return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to fetch analytics',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }
