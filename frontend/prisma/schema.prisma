@@ -37,7 +37,7 @@ model Menu {
   createdAt    DateTime @default(now())
 }
 
-model Order {
+model Transaction {
   id           String   @id @default(uuid())
   totalPrice   Float
   customerName String
