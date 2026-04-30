@@ -49,8 +49,13 @@ export default function CheckoutPage() {
     }
   };
 
+  useEffect(() => {
+    if (items.length === 0 && !orderId) {
+      window.location.href = '/menu';
+    }
+  }, [items, orderId]);
+
   if (items.length === 0 && !orderId) {
-     window.location.href = '/menu';
      return null;
   }
 
