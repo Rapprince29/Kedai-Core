@@ -28,6 +28,7 @@ export default function MenuPage() {
   const { items: allMenuItems, fetchMenu, loading } = useMenuStore();
   const menuRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const [user,           setUser]          = useState<any>(null);
   const [mounted,        setMounted]        = useState(false);
   const [lastStatus,     setLastStatus]    = useState<string | null>(null);
 
@@ -52,6 +53,9 @@ export default function MenuPage() {
   useEffect(() => { 
     setMounted(true);
     fetchMenu();
+
+    // Fetch User Profile
+    axios.get('/api/auth/me').then(res => setUser(res.data.user)).catch(() => {});
 
     const interval = setInterval(async () => {
       try {
@@ -112,18 +116,17 @@ export default function MenuPage() {
         style={{ borderBottom: `1px solid ${C.border}` }}
       >
         <div className="flex items-center gap-4">
-          <Link href="/"
-            className="p-2.5 rounded-2xl transition-all hover:scale-105 active:scale-95"
-            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-black tracking-tighter">KEDAI CODE</h1>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">System Active</p>
-            </div>
-          </div>
+           <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center bg-teal-400/10 border border-teal-400/20">
+              <User className="w-5 h-5 md:w-6 md:h-6 text-teal-400" />
+           </div>
+           <div>
+              <h1 className="text-sm md:text-xl font-black tracking-tighter leading-tight uppercase">
+                {user?.name || 'Explorer'}
+              </h1>
+              <span className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 opacity-60">
+                {user?.role || 'Guest'}
+              </span>
+           </div>
         </div>
 
         <div className="flex items-center gap-3">

@@ -23,6 +23,7 @@ const STATUS_MAP: any = {
 };
 
 export default function CashierDashboard() {
+  const [user, setUser] = useState<any>(null);
   const [orderId, setOrderId] = useState('');
   const [currentOrder, setCurrentOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,7 @@ export default function CashierDashboard() {
   };
 
   useEffect(() => {
+    axios.get('/api/auth/me').then(res => setUser(res.data.user)).catch(() => {});
     fetchRecent();
     const interval = setInterval(fetchRecent, 10000);
     return () => clearInterval(interval);
@@ -69,16 +71,17 @@ export default function CashierDashboard() {
         
         {/* ── HEADER ── */}
         <div className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase">ARCHITECT DESK</h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color: C.text }}>Cashier Command v2.0</p>
-          </div>
           <div className="flex items-center gap-4">
              <div className="w-12 h-12 rounded-2xl bg-teal-400/10 flex items-center justify-center border border-teal-400/20">
                 <Scan className="w-6 h-6 text-teal-400" />
              </div>
+             <div>
+                <h1 className="text-xl md:text-3xl font-black tracking-tighter uppercase">{user?.name || 'Architect'}</h1>
+                <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-white/5 border border-white/10 opacity-60">
+                   {user?.role} STATION
+                </span>
+             </div>
           </div>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           

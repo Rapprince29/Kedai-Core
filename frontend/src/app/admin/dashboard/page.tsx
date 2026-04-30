@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   TrendingUp, Users, ShoppingBag, AlertTriangle, 
-  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle, Package, LogOut
+  RefreshCcw, Clock, CheckCircle2, Truck, PlayCircle, Package, LogOut, Shield
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, 
@@ -30,6 +30,7 @@ const STATUS_COLORS: any = {
 };
 
 export default function AdminDashboard() {
+  const [user, setUser] = useState<any>(null);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,10 +41,14 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/analytics');
-      setData(res.data);
+      const [analytics, me] = await Promise.all([
+        axios.get('/api/analytics'),
+        axios.get('/api/auth/me')
+      ]);
+      setData(analytics.data);
+      setUser(me.data.user);
     } catch (err) {
-      console.error('Failed to fetch analytics', err);
+      console.error('Fetch failed', err);
     } finally {
       setLoading(false);
     }
@@ -68,9 +73,16 @@ export default function AdminDashboard() {
     <div className="min-h-screen p-8" style={{ backgroundColor: C.bg }}>
       {/* ── HEADER ── */}
       <div className="flex justify-between items-center mb-12">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter text-white mb-1">COMMAND CENTER</h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color: C.text }}>Artisan Insights v2.0</p>
+        <div className="flex items-center gap-4">
+           <div className="w-14 h-14 rounded-3xl bg-teal-400/10 flex items-center justify-center border border-teal-400/20">
+              <Shield className="w-8 h-8 text-teal-400" />
+           </div>
+           <div>
+             <h1 className="text-3xl font-black tracking-tighter text-white leading-tight">{user?.name || 'ADMIN'}</h1>
+             <span className="text-[9px] font-black uppercase tracking-[0.3em] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 opacity-60">
+                SYSTEM {user?.role} v2.0
+             </span>
+           </div>
         </div>
         <div className="flex gap-4 items-center">
            <Link href="/admin/users" className="hidden md:flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-teal-400/10 hover:border-teal-400/30 transition-all group">
