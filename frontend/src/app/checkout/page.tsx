@@ -122,27 +122,20 @@ export default function CheckoutPage() {
           </div>
         ) : (
           <div className="text-center space-y-10 animate-in zoom-in-95">
-             {method === 'CASH' ? (
-                <div className="space-y-8">
-                   <div className="p-10 rounded-[48px] bg-white border-8 border-teal-400/20 mx-auto w-fit shadow-[0_0_80px_rgba(15,150,156,0.2)]">
-                      <QRCodeSVG value={orderId || ''} size={200} />
-                   </div>
-                   <div>
-                      <h3 className="text-2xl font-black tracking-tight mb-2 uppercase">PRESENT TO ARCHITECT</h3>
-                      <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
-                        The cashier will scan this code to synchronize your payment and begin crafting your essence.
-                      </p>
-                   </div>
-                   <div className="p-4 rounded-2xl bg-teal-400/10 border border-teal-400/20 w-fit mx-auto">
-                      <p className="text-[10px] font-mono text-teal-400 uppercase tracking-widest">ORDER ID: {orderId}</p>
-                   </div>
+             <div className="space-y-8">
+                <div className="p-10 rounded-[48px] bg-white border-8 border-teal-400/20 mx-auto w-fit shadow-[0_0_80px_rgba(15,150,156,0.2)]">
+                   <QRCodeSVG value={orderId || ''} size={200} />
                 </div>
-             ) : (
-                <div className="space-y-8 py-20">
-                   <CheckCircle2 className="w-20 h-20 text-teal-400 mx-auto animate-bounce" />
-                   <h3 className="text-2xl font-black tracking-tight uppercase">CARDLESS SYNCING...</h3>
+                <div>
+                   <h3 className="text-2xl font-black tracking-tight mb-2 uppercase">PRESENT TO ARCHITECT</h3>
+                   <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
+                     The cashier will scan this code to synchronize your {method === 'CARDLESS' ? 'Cardless Sync' : 'Cash Payment'} and begin crafting your essence.
+                   </p>
                 </div>
-             )}
+                <div className="p-4 rounded-2xl bg-teal-400/10 border border-teal-400/20 w-fit mx-auto">
+                   <p className="text-[10px] font-mono text-teal-400 uppercase tracking-widest">ORDER ID: {orderId}</p>
+                </div>
+             </div>
              
              <button 
                onClick={() => { clearCart(); window.location.href = '/menu'; }}
