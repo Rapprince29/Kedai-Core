@@ -23,7 +23,15 @@ export default function CheckoutPage() {
   const [method, setMethod] = useState<'CASH' | 'CARDLESS' | null>(null);
   const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>('PENDING');
   const [step, setStep] = useState(1); // 1: Method, 2: QR/Process
+
+  const STATUS_MAP: any = {
+    PENDING: { label: 'WAITING PAYMENT', color: '#F59E0B' },
+    PAID: { label: 'PAYMENT SUCCESS', color: '#10B981' },
+    PROCESSING: { label: 'CRAFTING ESSENCE', color: '#0F969C' },
+    DONE: { label: 'COMPLETED', color: '#6DA5C0' }
+  };
 
   const handleCheckout = async () => {
     if (!method) return;
@@ -32,22 +40,43 @@ export default function CheckoutPage() {
       const res = await axios.post('/api/transactions', {
         items,
         totalPrice: getTotalPrice(),
-        customerName: 'Yoga', // Fallback, will be replaced by JWT name in API
+        customerName: 'Yoga', // Fallback
         method: method
       });
       setOrderId(res.data.id);
+      setStatus(res.data.status);
       setStep(2);
-      if (method === 'CASH') {
-         // Keep orderId for QR
-      } else {
-         // Logic for Cardless (Redirect to Midtrans/etc)
-      }
     } catch (err: any) {
       alert(`Checkout failed: ${err.response?.data?.error || err.message}`);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (step === 2 && orderId) {
+      const interval = setInterval(async () => {
+        try {
+          const res = await axios.get(`/api/transactions/${orderId}`);
+          if (res.data.status !== status) {
+            setStatus(res.data.status);
+            if (res.data.status === 'PAID') {
+               // Play notification sound or show alert
+               const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+               audio.play().catch(() => {});
+            }
+          }
+        } catch (err) {}
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [step, orderId, status]);
+
+  useEffect(() => {
+    if (status === 'PAID') {
+       alert('SUCCESS ON PAYMENT! Your essence is now being crafted.');
+    }
+  }, [status]);
 
   useEffect(() => {
     if (items.length === 0 && !orderId) {
@@ -135,9 +164,13 @@ export default function CheckoutPage() {
                       <h3 className="text-xl font-black uppercase tracking-tighter">DIGITAL RECEIPT</h3>
                       <p className="text-[9px] font-mono opacity-30">REF: {orderId?.slice(0,18)}...</p>
                    </div>
-                   <div className="text-right">
+                   <div className="text-right flex flex-col items-end gap-2">
                       <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded bg-teal-400/10 text-teal-400">
                         {method} SYNC
+                      </span>
+                      <span className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full animate-pulse" 
+                        style={{ backgroundColor: `${STATUS_MAP[status]?.color}20`, color: STATUS_MAP[status]?.color }}>
+                        {STATUS_MAP[status]?.label}
                       </span>
                    </div>
                 </div>
