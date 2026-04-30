@@ -3,32 +3,21 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
-import { CheckCircle2, ArrowLeft, ChefHat, Timer, PartyPopper, Loader2 } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, ChefHat, Timer, PartyPopper, Loader2, Zap, Waves } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
 import { gsap } from 'gsap';
 import axios from 'axios';
 
 const C = {
-  bg:      '#051F20', // Primary (Background)
-  white:   '#0B2B26', // Secondary
-  brown:   '#DAF1DE', // Highlights (Text)
-  terra:   '#8EB69B', // Soft Elements
-  accent:  '#235347', // Accent
-  muted:   '#8EB69B', // Text/Soft
-  warm:    '#163832', // Secondary dark
-  border:  'rgba(142,182,155,0.15)', // Soft green border
-  green:   '#DAF1DE',
+  bg:      '#05161A', // Deep Sea Background
+  card:    '#072E33', // Deep Teal Card
+  accent:  '#0F969C', // Teal Accent
+  soft:    '#0C7075', // Dark Teal
+  text:    '#6DA5C0', // Sky Blue Text
+  muted:   '#294D61', // Muted Blue
+  border:  'rgba(15,150,156,0.1)'
 };
-
-function CoffeeBean({ size = 28, color = '#8EB69B', opacity = 1 }: { size?: number; color?: string; opacity?: number }) {
-  return (
-    <svg width={size} height={size * 0.65} viewBox="0 0 60 39" fill="none" style={{ opacity }}>
-      <ellipse cx="30" cy="19.5" rx="30" ry="19.5" fill={color} />
-      <path d="M30 4 Q30 19.5 30 35" stroke="rgba(0,0,0,0.2)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-    </svg>
-  );
-}
 
 let socket: ReturnType<typeof io> | null = null;
 function getSocket() {
@@ -55,15 +44,14 @@ function CheckoutContent() {
       try {
         const res = await axios.post('/api/transactions', {
           totalPrice: getTotalPrice() * 1.1,
-          customerName: 'Guest Customer', // Could be from a form
+          customerName: 'Artisan Guest',
           items: items.map(i => ({ name: i.name, quantity: i.quantity, price: i.price }))
         });
         setOrderId(res.data.id);
         sk.emit('joinOrder', res.data.id);
-        setTimeout(() => setIsProcessing(false), 1500);
+        setTimeout(() => setIsProcessing(false), 2000);
       } catch (err) {
         console.error('Failed to create transaction:', err);
-        // Fallback to random ID if API fails
         const id = `KC-${Math.floor(1000 + Math.random() * 9000)}`;
         setOrderId(id);
         setIsProcessing(false);
@@ -73,9 +61,7 @@ function CheckoutContent() {
     createTransaction();
 
     sk.on('orderStatusChanged', (data: { status: string }) => {
-      if (data.status === 'CONFIRMED') {
-        setStatus('CONFIRMED');
-      }
+      if (data.status === 'CONFIRMED') setStatus('CONFIRMED');
     });
 
     return () => { sk.off('orderStatusChanged'); };
@@ -84,35 +70,26 @@ function CheckoutContent() {
   useEffect(() => {
     if (status !== 'CONFIRMED' || !confirmedRef.current) return;
     gsap.fromTo(confirmedRef.current,
-      { scale: 0.85, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.5)' }
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power4.out' }
     );
   }, [status]);
 
   const subtotal = getTotalPrice();
-  const tax      = subtotal * 0.1;
-  const total    = subtotal + tax;
+  const total    = subtotal * 1.1;
 
   if (isProcessing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6 text-center"
-        style={{ backgroundColor: C.bg }}>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-6 text-center text-white" style={{ backgroundColor: C.bg }}>
         <div className="relative">
-          <div className="w-[120px] h-[120px] rounded-full overflow-hidden shadow-2xl relative"
-            style={{ backgroundColor: C.white, border: `2px solid ${C.border}` }}>
-            <img
-              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&q=80&fit=crop"
-              alt="Loading"
-              className="w-full h-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-12 h-12 animate-spin" style={{ color: C.terra }} />
-            </div>
+          <div className="w-32 h-32 rounded-[40px] flex items-center justify-center relative" style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}>
+            <div className="absolute inset-0 rounded-[40px] animate-ping opacity-10 bg-teal-400" />
+            <Loader2 className="w-12 h-12 animate-spin text-teal-400" />
           </div>
         </div>
         <div>
-          <h2 className="text-3xl font-bold italic mb-2" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>Securing Your Order...</h2>
-          <p className="text-sm tracking-widest uppercase font-bold" style={{ color: C.muted }}>Crafting Digital Artisan Receipt</p>
+          <h2 className="text-3xl font-black tracking-tighter mb-2">SYNCING WITH CORE</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Establishing secure artisan link</p>
         </div>
       </div>
     );
@@ -120,128 +97,119 @@ function CheckoutContent() {
 
   if (status === 'CONFIRMED') {
     return (
-      <div ref={confirmedRef} className="min-h-screen flex flex-col" style={{ backgroundColor: C.bg }}>
-        <div className="w-full py-16 flex flex-col items-center text-center px-6 relative overflow-hidden"
-          style={{ background: `linear-gradient(180deg, ${C.accent}44, ${C.bg})` }}>
-          <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 z-10 animate-bounce"
-            style={{ backgroundColor: C.terra, boxShadow: `0 20px 60px ${C.terra}40` }}>
-            <ChefHat className="w-12 h-12 text-white" />
+      <div ref={confirmedRef} className="min-h-screen flex flex-col text-white" style={{ backgroundColor: C.bg }}>
+        <div className="w-full py-24 flex flex-col items-center text-center px-10 relative overflow-hidden"
+          style={{ background: `radial-gradient(circle at top, ${C.soft}44, ${C.bg})` }}>
+          
+          <div className="w-24 h-24 rounded-[32px] flex items-center justify-center mb-8 relative z-10"
+            style={{ backgroundColor: C.accent, boxShadow: `0 20px 60px ${C.accent}40` }}>
+            <ChefHat className="w-12 h-12 text-[#05161A]" />
           </div>
-          <div className="flex items-center gap-3 mb-3 z-10">
-            <PartyPopper className="w-6 h-6" style={{ color: C.brown }} />
-            <h1 className="text-4xl font-bold italic" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>Confirmed!</h1>
-            <PartyPopper className="w-6 h-6 scale-x-[-1]" style={{ color: C.brown }} />
-          </div>
-          <p className="text-sm z-10 max-w-xs leading-relaxed" style={{ color: C.muted }}>
-            Our artisans are currently preparing your selection with seasonal precision 🌿
+
+          <h1 className="text-5xl font-black tracking-tighter mb-4 z-10 uppercase">CONFIRMED</h1>
+          <p className="text-sm z-10 max-w-xs leading-relaxed opacity-60 font-medium">
+            Your selected flavors are being processed in our deep sea artisan kitchen.
           </p>
-          <div className="mt-8 flex items-center gap-3 px-6 py-2.5 rounded-full z-10"
-            style={{ backgroundColor: `${C.terra}15`, border: `1px solid ${C.border}` }}>
-            <Timer className="w-4 h-4" style={{ color: C.terra }} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: C.terra }}>
-              Preparation: 15–20 Min
+
+          <div className="mt-12 flex items-center gap-4 px-6 py-3 rounded-2xl z-10"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}` }}>
+            <Timer className="w-4 h-4 text-teal-400" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-400">
+              ETA: 15–20 MINUTES
             </span>
           </div>
         </div>
 
-        <div className="flex-grow px-8 py-6 flex flex-col gap-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em]" style={{ color: `${C.muted}60` }}>Order Summary</p>
+        <div className="flex-grow px-10 py-10 space-y-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Selection Summary</p>
           {items.map(item => (
-            <div key={item.id} className="flex justify-between items-center">
+            <div key={item.id} className="flex justify-between items-center p-4 rounded-3xl" style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0" style={{ backgroundColor: C.warm }}>
+                <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-white/5">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <p className="text-base font-bold italic" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</p>
-                  <p className="text-xs font-bold opacity-60" style={{ color: C.muted }}>{item.quantity} × Rp {item.price.toLocaleString('id-ID')}</p>
+                  <p className="text-base font-bold text-white">{item.name}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-30">{item.quantity} Unit · Rp {item.price.toLocaleString()}</p>
                 </div>
               </div>
-              <p className="text-sm font-bold" style={{ color: C.brown }}>
-                Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+              <p className="text-sm font-black" style={{ color: C.text }}>
+                Rp {(item.price * item.quantity).toLocaleString()}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="p-8 rounded-t-[48px]" style={{ backgroundColor: C.white, borderTop: `1px solid ${C.border}` }}>
-          <div className="space-y-3 mb-8">
-            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-              <span style={{ color: C.muted }}>Transaction ID</span>
-              <span style={{ color: C.terra }}>{orderId}</span>
+        <div className="p-10 rounded-t-[48px]" style={{ backgroundColor: C.card, borderTop: `1px solid ${C.border}` }}>
+          <div className="space-y-4 mb-10">
+            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-40">
+              <span>ARTISAN ID</span>
+              <span>{orderId.slice(0, 12)}</span>
             </div>
-            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-              <span style={{ color: C.muted }}>Method</span>
-              <span style={{ color: C.brown }}>{method === 'cardless' ? 'Digital Wallet' : 'Cashier Pay'}</span>
-            </div>
-            <div className="h-px w-full my-4" style={{ backgroundColor: C.border }} />
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-bold italic" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>Total Paid</span>
-              <span className="text-2xl font-bold" style={{ color: C.terra }}>Rp {total.toLocaleString('id-ID')}</span>
+            <div className="h-px w-full bg-white/5" />
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Final Essence Fee</p>
+                <p className="text-4xl font-black text-teal-400">Rp {total.toLocaleString()}</p>
+              </div>
+              <button onClick={() => { clearCart(); router.push('/'); }}
+                className="px-10 py-5 rounded-2xl font-black text-xs tracking-[0.2em] uppercase transition-all hover:scale-105 active:scale-95 text-[#05161A]"
+                style={{ backgroundColor: C.accent, boxShadow: `0 16px 48px ${C.accent}40` }}>
+                DISMISS
+              </button>
             </div>
           </div>
-
-          <button onClick={() => { clearCart(); router.push('/'); }}
-            className="w-full py-5 rounded-[24px] font-bold text-white text-sm tracking-[0.2em] uppercase transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{ backgroundColor: C.accent, boxShadow: `0 16px 48px ${C.accent}40` }}>
-            Return to Forest
-          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center" style={{ backgroundColor: C.bg }}>
-      <div className="w-full flex justify-start mb-8">
-        <button onClick={() => router.back()} className="p-3 rounded-full transition-all hover:scale-110"
-          style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-          <ArrowLeft className="w-5 h-5" style={{ color: C.brown }} />
+    <div className="min-h-screen p-10 flex flex-col items-center text-white" style={{ backgroundColor: C.bg }}>
+      <div className="w-full flex justify-start mb-10">
+        <button onClick={() => router.back()} className="p-3 rounded-2xl transition-all active:scale-95"
+          style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}>
+          <ArrowLeft className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="w-full max-w-md rounded-[48px] p-10 flex flex-col items-center text-center relative overflow-hidden"
-        style={{ backgroundColor: C.white, border: `1px solid ${C.border}`, boxShadow: '0 32px 80px rgba(0,0,0,0.3)' }}>
-        <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: C.terra }} />
+      <div className="w-full max-w-md rounded-[56px] p-12 flex flex-col items-center text-center relative overflow-hidden"
+        style={{ backgroundColor: C.card, border: `1px solid ${C.border}`, boxShadow: '0 40px 100px rgba(0,0,0,0.5)' }}>
         
-        <div className="rounded-full p-5 mb-6 mt-4" style={{ backgroundColor: `${C.terra}15` }}>
-          <CheckCircle2 className="w-12 h-12" style={{ color: C.terra }} />
+        <div className="w-20 h-20 rounded-[32px] bg-teal-400/10 flex items-center justify-center mb-8">
+           <Zap className="w-10 h-10 text-teal-400" />
         </div>
-        <h2 className="text-3xl font-bold italic mb-2" style={{ color: C.brown, fontFamily: "'Cormorant Garamond', serif" }}>Order Transmitted</h2>
-        <p className="text-sm mb-10 opacity-70" style={{ color: C.muted }}>Present this artisan code to the concierge</p>
+        <h2 className="text-3xl font-black tracking-tighter mb-3 uppercase">SYNC COMPLETE</h2>
+        <p className="text-xs opacity-40 font-medium mb-12">Present this code to the artisan concierge</p>
 
-        <div className="bg-white p-8 rounded-[32px] mb-8 relative shadow-2xl">
+        <div className="bg-white p-8 rounded-[40px] mb-12 shadow-2xl relative">
           <QRCodeSVG
-            value={JSON.stringify({ orderId, total, items: items.map(i => ({ name: i.name, qty: i.quantity })) })}
-            size={220} level="H"
+            value={JSON.stringify({ id: orderId, total })}
+            size={200} level="H"
           />
-          <div className="absolute inset-2 rounded-[28px] animate-pulse pointer-events-none"
-            style={{ border: `3px dashed ${C.terra}25` }} />
+          <div className="absolute -inset-2 border-2 border-dashed border-teal-500/20 rounded-[48px] animate-pulse" />
         </div>
 
-        <div className="flex items-center gap-3 px-6 py-3 rounded-full mb-10"
-          style={{ backgroundColor: `${C.terra}10`, border: `1px solid ${C.border}` }}>
-          <div className="w-2.5 h-2.5 rounded-full animate-ping" style={{ backgroundColor: C.terra }} />
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: C.terra }}>Awaiting Concierge Confirmation</span>
+        <div className="flex items-center gap-3 px-6 py-3 rounded-2xl mb-12"
+          style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}` }}>
+          <div className="w-2 h-2 rounded-full animate-ping bg-teal-400" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-400">WAITING FOR HANDSHAKE</span>
         </div>
 
-        <div className="w-full pt-8 space-y-4" style={{ borderTop: `1px solid ${C.border}` }}>
-          <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-            <span style={{ color: C.muted }}>Artisan ID</span>
-            <span style={{ color: C.terra }}>{orderId}</span>
-          </div>
-          <div className="flex justify-between text-xl font-bold italic pt-4"
-            style={{ borderTop: `1px solid ${C.border}`, fontFamily: "'Cormorant Garamond', serif" }}>
-            <span style={{ color: C.brown }}>Total Fee</span>
-            <span style={{ color: C.terra }}>Rp {total.toLocaleString('id-ID')}</span>
-          </div>
+        <div className="w-full pt-10 border-t border-white/5 flex justify-between items-end">
+           <div className="text-left">
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-30">Total Fee</p>
+              <p className="text-2xl font-black text-teal-400">Rp {total.toLocaleString()}</p>
+           </div>
+           <p className="text-[10px] font-black opacity-20 uppercase tracking-widest">ID: {orderId.slice(0, 6)}</p>
         </div>
       </div>
 
       <button onClick={() => getSocket().emit('confirmOrder', orderId)}
-        className="mt-12 px-8 py-4 rounded-2xl text-[10px] uppercase font-bold tracking-[0.4em] transition-all hover:bg-white/5 opacity-40 hover:opacity-100"
-        style={{ border: `1px dashed ${C.border}`, color: C.muted }}>
-        [ Dev ] Simulate Concierge ACC
+        className="mt-16 px-8 py-4 rounded-2xl text-[10px] uppercase font-black tracking-[0.5em] transition-all opacity-10 hover:opacity-100 flex items-center gap-3"
+        style={{ border: `1px solid ${C.border}` }}>
+        <Waves className="w-4 h-4" />
+        SIMULATE HANDSHAKE
       </button>
     </div>
   );
@@ -250,8 +218,8 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#051F20' }}>
-        <Loader2 className="w-12 h-12 animate-spin" style={{ color: '#8EB69B' }} />
+      <div className="min-h-screen flex items-center justify-center text-white" style={{ backgroundColor: '#05161A' }}>
+        <Waves className="w-10 h-10 animate-pulse text-teal-500 opacity-20" />
       </div>
     }>
       <CheckoutContent />

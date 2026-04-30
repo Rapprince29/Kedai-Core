@@ -1,191 +1,178 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area
-} from 'recharts';
-import { 
-  TrendingUp, ShoppingCart, DollarSign, 
-  Package, AlertTriangle, ChevronRight, ArrowLeft, Loader2 
+  TrendingUp, Users, ShoppingBag, AlertTriangle, 
+  ArrowUpRight, ArrowDownRight, Package, RefreshCcw
 } from 'lucide-react';
-import Link from 'next/link';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, BarChart, Bar 
+} from 'recharts';
+import axios from 'axios';
 
 const C = {
-  bg:      '#051F20', // Primary (Background)
-  card:    '#0B2B26', // Secondary
-  card2:   '#163832', // Secondary dark
-  primary: '#8EB69B', // Soft Elements (Accent)
-  accent:  '#235347', // Accent
-  text:    '#DAF1DE', // Highlights (Text)
-  muted:   '#8EB69B', // Text/Soft
-  border:  'rgba(142,182,155,0.15)',
-  red:     '#ff6b6b',
+  bg:      '#05161A', // Deep Sea Background
+  card:    '#072E33', // Deep Teal Card
+  accent:  '#0F969C', // Teal Accent
+  soft:    '#0C7075', // Dark Teal
+  text:    '#6DA5C0', // Sky Blue Text
+  muted:   '#294D61', // Muted Blue
+  border:  'rgba(15,150,156,0.1)'
 };
 
-export default function DashboardPage() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['dashboard-analytics'],
-    queryFn: async () => {
-      const res = await axios.get(`/api/analytics`);
-      return res.data;
-    },
-    refetchInterval: 60000,
-  });
+export default function AdminDashboard() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen" style={{ backgroundColor: C.bg }}>
-        <Loader2 className="w-12 h-12 animate-spin mb-4" style={{ color: C.primary }} />
-        <p className="font-bold uppercase tracking-widest text-xs" style={{ color: C.muted }}>Syncing Artisan Intelligence...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get('/api/analytics');
+      setData(res.data);
+    } catch (err) {
+      console.error('Failed to fetch analytics', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: C.bg }}>
+      <RefreshCcw className="w-8 h-8 animate-spin text-teal-500" />
+    </div>
+  );
+
+  const stats = [
+    { label: 'Total Revenue', value: `Rp ${data?.totalRevenue.toLocaleString()}`, icon: TrendingUp, trend: '+12.5%', color: C.accent },
+    { label: 'Active Orders', value: data?.todayTransactionsCount || 0, icon: ShoppingBag, trend: '+4', color: '#6DA5C0' },
+    { label: 'Inventory Alerts', value: data?.inventoryAlertsCount || 0, icon: AlertTriangle, trend: 'Low Stock', color: '#EF4444' },
+  ];
 
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: C.bg }}>
-      <header className="mb-12 flex justify-between items-start">
-        <div className="flex items-center gap-4">
-          <Link href="/admin" className="p-3 rounded-full transition-all hover:scale-110" style={{ backgroundColor: C.card }}>
-            <ArrowLeft className="w-5 h-5" style={{ color: C.text }} />
-          </Link>
-          <div>
-            <h1 className="text-4xl font-bold italic" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>
-              Operational Insights
-            </h1>
-            <p className="text-[10px] uppercase tracking-[0.4em] font-bold mt-2" style={{ color: C.muted }}>Kedai-Code Real-time Metrics</p>
-          </div>
+      {/* ── HEADER ── */}
+      <div className="flex justify-between items-center mb-12">
+        <div>
+          <h1 className="text-3xl font-black tracking-tighter text-white mb-1">COMMAND CENTER</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.5em]" style={{ color: C.text }}>Artisan Insights v2.0</p>
         </div>
-        <div className="text-right hidden md:block">
-          <p className="text-[10px] uppercase tracking-widest font-bold opacity-40" style={{ color: C.muted }}>Last Synchronized</p>
-          <p className="text-lg font-bold" style={{ color: C.primary }}>{new Date().toLocaleTimeString()}</p>
-        </div>
-      </header>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard 
-          title="Accumulated Revenue" 
-          value={`Rp ${stats?.totalRevenue?.toLocaleString('id-ID')}`} 
-          icon={<DollarSign className="w-6 h-6" />}
-          sub="Total collection"
-        />
-        <StatCard 
-          title="Daily Performance" 
-          value={`Rp ${stats?.todayRevenue?.toLocaleString('id-ID')}`} 
-          icon={<TrendingUp className="w-6 h-6" />}
-          sub={`${stats?.todayTransactionsCount} orders today`}
-        />
-        <StatCard 
-          title="Total Transactions" 
-          value={stats?.totalTransactions} 
-          icon={<ShoppingCart className="w-6 h-6" />}
-          sub="Successful exchanges"
-        />
-        <StatCard 
-          title="Inventory Alerts" 
-          value={stats?.inventoryAlertsCount} 
-          icon={<AlertTriangle className={`w-6 h-6 ${stats?.inventoryAlertsCount > 0 ? 'animate-pulse' : ''}`} />}
-          sub="Items needing refill"
-          alert={stats?.inventoryAlertsCount > 0}
-        />
+        <button 
+          onClick={fetchData}
+          className="p-3 rounded-2xl border transition-all active:scale-95" 
+          style={{ backgroundColor: C.card, borderColor: C.border }}
+        >
+          <RefreshCcw className="w-5 h-5 text-teal-400" />
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Weekly Trend Chart */}
-        <div className="lg:col-span-2 rounded-[40px] p-10 border shadow-2xl" style={{ backgroundColor: C.card, borderColor: C.border }}>
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-2xl font-bold italic flex items-center gap-3" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>
-              Revenue Trajectory
-            </h2>
+      {/* ── STATS GRID ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {stats.map((s, i) => (
+          <div key={i} className="p-8 rounded-[32px] border transition-all hover:scale-[1.02]" style={{ backgroundColor: C.card, borderColor: C.border }}>
+            <div className="flex justify-between items-start mb-6">
+              <div className="p-3 rounded-2xl" style={{ backgroundColor: `${s.color}10` }}>
+                <s.icon className="w-6 h-6" style={{ color: s.color }} />
+              </div>
+              <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: s.color }}>
+                {s.trend}
+              </span>
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">{s.label}</p>
+            <h3 className="text-3xl font-black text-white">{s.value}</h3>
           </div>
-          <div className="h-[350px] w-full">
+        ))}
+      </div>
+
+      {/* ── CHARTS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
+          <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Revenue Flow (7D)</h3>
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats?.dailyTrend}>
+              <AreaChart data={data?.dailyTrend}>
                 <defs>
-                  <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={C.primary} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={C.primary} stopOpacity={0}/>
+                  <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={C.accent} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={C.accent} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(142,182,155,0.05)" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke={C.muted} 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  tickFormatter={(val) => new Date(val).toLocaleDateString('id-ID', { weekday: 'short' })}
-                />
-                <YAxis 
-                  stroke={C.muted} 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  tickFormatter={(val) => `Rp ${val/1000}k`}
-                />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                <XAxis dataKey="date" hide />
+                <YAxis hide />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: C.card2, border: `1px solid ${C.border}`, borderRadius: '16px', color: C.text }}
+                  contentStyle={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: '16px' }}
+                  itemStyle={{ color: C.accent }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke={C.primary} 
-                  strokeWidth={3} 
-                  fillOpacity={1} 
-                  fill="url(#colorAmount)" 
-                />
+                <Area type="monotone" dataKey="amount" stroke={C.accent} strokeWidth={4} fillOpacity={1} fill="url(#colorAmt)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Low Stock Alerts */}
-        <div className="rounded-[40px] p-10 border shadow-2xl" style={{ backgroundColor: C.card, borderColor: C.border }}>
-          <h2 className="text-2xl font-bold italic mb-8 flex items-center gap-3" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>
-            Stock Vigilance
-          </h2>
+        <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
+          <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Stock Resonance</h3>
           <div className="space-y-6">
-            {stats?.lowStockItems?.length > 0 ? stats.lowStockItems.map((item: any) => (
-              <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl transition-all" style={{ backgroundColor: C.card2 }}>
-                <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            {data?.lowStockItems.map((item: any) => (
+              <div key={item.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-black/20 border border-white/5 overflow-hidden">
+                    <img src={item.image} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">{item.name}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30">{item.category}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold italic truncate" style={{ color: C.text, fontFamily: "'Cormorant Garamond', serif" }}>{item.name}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: C.red }}>{item.stock} left</p>
+                <div className="text-right">
+                  <p className="text-xs font-black text-red-400">{item.stock} left</p>
+                  <div className="w-24 h-1.5 bg-black/20 rounded-full mt-1 overflow-hidden">
+                    <div className="h-full bg-red-500" style={{ width: `${(item.stock / 20) * 100}%` }} />
+                  </div>
                 </div>
               </div>
-            )) : (
-              <div className="py-10 text-center opacity-40">
-                <Package className="w-12 h-12 mx-auto mb-4" />
-                <p className="text-xs font-bold uppercase tracking-widest">All Stock Secure</p>
-              </div>
-            )}
+            ))}
           </div>
-          <Link href="/admin" className="block w-full mt-10 py-4 rounded-2xl text-center text-xs font-bold uppercase tracking-[0.2em] transition-all hover:scale-105"
-            style={{ backgroundColor: C.accent, color: '#fff' }}>
-            Refill Inventory
-          </Link>
         </div>
       </div>
-    </div>
-  );
-}
 
-function StatCard({ title, value, icon, sub, alert }: any) {
-  return (
-    <div className="rounded-[32px] p-8 border shadow-xl transition-all hover:translate-y-[-4px]" 
-      style={{ backgroundColor: C.card, borderColor: alert ? C.red : C.border }}>
-      <div className="flex justify-between items-start mb-6">
-        <div className="p-4 rounded-2xl" style={{ backgroundColor: C.card2, color: alert ? C.red : C.primary }}>
-          {icon}
+      {/* ── RECENT ACTIVITY ── */}
+      <div className="p-10 rounded-[40px] border" style={{ backgroundColor: C.card, borderColor: C.border }}>
+        <h3 className="text-sm font-black uppercase tracking-[0.3em] mb-10 opacity-40">Recent Echoes (Orders)</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-[10px] font-black uppercase tracking-widest opacity-30 border-b border-white/5">
+                <th className="pb-4">Transaction ID</th>
+                <th className="pb-4">Explorer Name</th>
+                <th className="pb-4">Essence Total</th>
+                <th className="pb-4">Frequency</th>
+                <th className="pb-4 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {data?.recentTransactions.map((t: any) => (
+                <tr key={t.id} className="text-sm">
+                  <td className="py-6 font-mono text-xs opacity-40">{t.id.slice(0, 8)}</td>
+                  <td className="py-6 font-bold text-white">{t.customerName}</td>
+                  <td className="py-6 text-teal-400 font-black">Rp {t.totalPrice.toLocaleString()}</td>
+                  <td className="py-6 opacity-40">{new Date(t.createdAt).toLocaleTimeString()}</td>
+                  <td className="py-6 text-right">
+                    <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" 
+                      style={{ backgroundColor: t.status === 'DONE' ? `${C.accent}20` : 'rgba(255,255,255,0.03)', color: t.status === 'DONE' ? C.accent : C.text }}>
+                      {t.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: C.muted }}>{title}</p>
-      <p className="text-2xl font-bold tracking-tight" style={{ color: C.text }}>{value}</p>
-      <p className="text-[10px] font-bold mt-2 opacity-60" style={{ color: C.muted }}>{sub}</p>
     </div>
   );
 }
