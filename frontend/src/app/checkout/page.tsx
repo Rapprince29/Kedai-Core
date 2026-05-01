@@ -91,45 +91,45 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen p-6 text-white" style={{ backgroundColor: C.bg }}>
       {/* ── HEADER ── */}
-      <div className="flex items-center gap-6 mb-12">
-        <Link href="/cart" className="p-3 rounded-2xl bg-white/5 border border-white/5 text-teal-400">
+      <div className="flex items-center gap-4 md:gap-6 mb-8 md:mb-12 max-w-4xl mx-auto">
+        <Link href="/cart" className="p-2.5 md:p-3 rounded-2xl bg-white/5 border border-white/5 text-teal-400 transition-all hover:bg-white/10">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-black tracking-tighter uppercase">TRANSMISSION</h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Finalizing Essence Flow</p>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">TRANSMISSION</h1>
+          <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] opacity-40">Finalizing Essence Flow</p>
         </div>
       </div>
 
       <div className="max-w-md mx-auto">
         {step === 1 ? (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+          <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4">
              <div className="space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-30 text-center">Select Payment Modality</p>
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest opacity-30 text-center">Select Payment Modality</p>
                 
                 <button 
                   onClick={() => setMethod('CARDLESS')}
-                  className={`w-full p-6 rounded-[32px] border-2 transition-all flex items-center gap-6 ${method === 'CARDLESS' ? 'border-teal-400 bg-teal-400/5' : 'border-white/5 bg-white/5 opacity-60'}`}
+                  className={`w-full p-4 md:p-6 rounded-[28px] md:rounded-[32px] border-2 transition-all flex items-center gap-4 md:gap-6 ${method === 'CARDLESS' ? 'border-teal-400 bg-teal-400/5' : 'border-white/5 bg-white/5 opacity-60'}`}
                 >
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-teal-400/10">
-                     <Wallet className="w-7 h-7 text-teal-400" />
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center bg-teal-400/10">
+                     <Wallet className="w-6 h-6 md:w-7 md:h-7 text-teal-400" />
                   </div>
                   <div className="text-left">
-                     <h4 className="font-black text-lg">CARDLESS</h4>
-                     <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">OVO, GOPAY, QRIS</p>
+                     <h4 className="font-black text-base md:text-lg">CARDLESS</h4>
+                     <p className="text-[9px] md:text-[10px] font-bold opacity-30 uppercase tracking-widest">OVO, GOPAY, QRIS</p>
                   </div>
                 </button>
 
                 <button 
                   onClick={() => setMethod('CASH')}
-                  className={`w-full p-6 rounded-[32px] border-2 transition-all flex items-center gap-6 ${method === 'CASH' ? 'border-teal-400 bg-teal-400/5' : 'border-white/5 bg-white/5 opacity-60'}`}
+                  className={`w-full p-4 md:p-6 rounded-[28px] md:rounded-[32px] border-2 transition-all flex items-center gap-4 md:gap-6 ${method === 'CASH' ? 'border-teal-400 bg-teal-400/5' : 'border-white/5 bg-white/5 opacity-60'}`}
                 >
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-teal-400/10">
-                     <Banknote className="w-7 h-7 text-teal-400" />
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center bg-teal-400/10">
+                     <Banknote className="w-6 h-6 md:w-7 md:h-7 text-teal-400" />
                   </div>
                   <div className="text-left">
-                     <h4 className="font-black text-lg">CASH AT CASHIER</h4>
-                     <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">PAY DIRECTLY TO THE ARCHITECT</p>
+                     <h4 className="font-black text-base md:text-lg">CASH AT CASHIER</h4>
+                     <p className="text-[9px] md:text-[10px] font-bold opacity-30 uppercase tracking-widest">PAY DIRECTLY TO THE ARCHITECT</p>
                   </div>
                 </button>
              </div>
