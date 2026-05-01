@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import { serialize } from 'cookie'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret'
+const JWT_SECRET = process.env.JWT_SECRET || 'kedai-core-secret-key-2026'
 
 export async function POST(request: NextRequest) {
   try {

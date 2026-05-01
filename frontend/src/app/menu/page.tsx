@@ -58,10 +58,10 @@ export default function MenuPage() {
     // Fetch User Profile
     axios.get('/api/auth/me')
       .then(res => setUser(res.data.user))
-      .catch((err) => {
+      .catch(async (err) => {
         console.error('Session invalid or expired');
         if (err.response?.status === 401) {
-           document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           await axios.post('/api/auth/logout');
            window.location.href = '/auth/login';
         }
       });

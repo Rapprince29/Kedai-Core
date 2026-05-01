@@ -70,7 +70,7 @@ export default function WelcomePage() {
         setIsLoggedIn(true);
       } else if (res.status === 401) {
         // Clear stale cookie to prevent loop
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        fetch('/api/auth/logout', { method: 'POST' });
       }
     }).catch(() => {}).finally(() => setAuthLoading(false));
 

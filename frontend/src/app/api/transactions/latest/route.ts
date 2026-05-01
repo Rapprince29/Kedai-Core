@@ -10,7 +10,7 @@ export async function GET() {
 
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'kedai-core-secret-key-2026') as any
     const userId = decoded.userId
 
     const latest = await (prisma as any).transaction.findFirst({

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     
     if (token) {
        try {
-          const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
+          const decoded = jwt.verify(token, process.env.JWT_SECRET || 'kedai-core-secret-key-2026') as any
           customerName = decoded.name || 'Explorer'
        } catch (err) {}
     }
