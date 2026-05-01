@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import Providers from "./providers";
+import CustomCursor from "@/components/CustomCursor";
 
 export default function RootLayout({
   children,
@@ -25,6 +26,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning style={{ backgroundColor: '#05161A' }}>
         <Providers>
+          <CustomCursor />
           {children}
         </Providers>
       </body>
