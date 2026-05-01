@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kedai Core - Menu Digital",
+  title: "KEDAI CORE - Menu Digital",
   description: "Nikmati kelezatan menu spesial kami langsung dari meja Anda.",
 };
 

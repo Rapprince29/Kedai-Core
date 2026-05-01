@@ -165,7 +165,7 @@ export default function WelcomePage() {
              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
                 <Waves className="w-5 h-5 text-teal-400" />
              </div>
-             <span className="font-black tracking-[0.4em] uppercase text-xs text-white">Kedai Core</span>
+             <span className="font-black tracking-[0.4em] uppercase text-xs text-white">KEDAI CORE</span>
           </div>
 
           <div className="hidden md:flex items-center gap-8">

@@ -76,7 +76,7 @@ export default function Preloader({ onDone }: PreloaderProps) {
         </div>
 
         <div ref={textRef} className="text-center">
-          <h1 className="text-2xl font-black tracking-[0.5em] text-white uppercase mb-2">KEDAI CODE</h1>
+          <h1 className="text-2xl font-black tracking-[0.5em] text-white uppercase mb-2">KEDAI CORE</h1>
           <p className="text-[10px] tracking-[0.6em] uppercase text-teal-400 font-bold opacity-60">System Syncing...</p>
         </div>
 
