@@ -65,7 +65,9 @@ export default function MenuPage() {
            window.location.href = '/auth/login';
         }
       });
+  }, [fetchMenu]); // Only fetch once on mount
 
+  useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const res = await axios.get('/api/transactions/latest');
@@ -77,7 +79,7 @@ export default function MenuPage() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [fetchMenu, lastStatus]);
+  }, [lastStatus]);
 
   // GSAP STAGGER ENTRANCE
   useLayoutEffect(() => {
