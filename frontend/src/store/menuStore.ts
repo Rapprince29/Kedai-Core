@@ -33,10 +33,11 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await axios.get('/api/menu');
-      set({ items: res.data, loading: false });
+      const data = Array.isArray(res.data) ? res.data : [];
+      set({ items: data, loading: false });
     } catch (err: any) {
       console.error('Failed to fetch menu:', err);
-      set({ error: 'Failed to fetch menu items', loading: false });
+      set({ error: 'Failed to fetch menu items', loading: false, items: [] });
     }
   },
 

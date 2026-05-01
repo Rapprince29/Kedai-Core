@@ -115,13 +115,15 @@ export default function MenuPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const filteredMenu = useMemo(() =>
-    allMenuItems.filter(item => {
-      const matchCat   = activeCategory === 'Semua' || item.category === activeCategory;
-      const matchFlavor = activeFlavor === 'Semua' || item.flavor === activeFlavor;
-      const matchQuery = item.name.toLowerCase().includes(debouncedQuery.toLowerCase());
-      return matchCat && matchFlavor && matchQuery;
-    }), [activeCategory, activeFlavor, debouncedQuery, allMenuItems]);
+  const filteredMenu = useMemo(() => {
+    if (!Array.isArray(allMenuItems)) return [];
+    return allMenuItems.filter(item => {
+       const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory;
+       const matchesFlavor = activeFlavor === 'Semua' || item.flavor === activeFlavor;
+       const matchesSearch = item.name.toLowerCase().includes(debouncedQuery.toLowerCase());
+       return matchesCategory && matchesFlavor && matchesSearch;
+    });
+  }, [activeCategory, activeFlavor, debouncedQuery, allMenuItems]);
 
   useLayoutEffect(() => {
     const targets = menuRefs.current.filter(Boolean);
