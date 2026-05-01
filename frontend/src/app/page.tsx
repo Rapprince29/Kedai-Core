@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -178,7 +178,7 @@ export default function WelcomePage() {
            {/* Abstract Background Elements */}
            <div className="hero-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-teal-500/10 blur-[80px] md:blur-[120px] rounded-full pointer-events-none" />
            <div className="absolute top-0 left-0 w-full h-full opacity-10 md:opacity-20 pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(circle, #0F969C 1px, transparent 1px)', backgroundSize: '40px md:60px 40px md:60px' }} />
+             style={{ backgroundImage: 'radial-gradient(circle, #0F969C 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
            <div className="relative z-10 text-center max-w-5xl mx-auto">
               <div className="hero-cta inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 mb-6 md:mb-8">

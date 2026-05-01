@@ -5,6 +5,8 @@ import { ArrowLeft, Trash2, Plus, Minus, ShoppingBag, ChevronRight, AlertCircle,
 import Link from 'next/link';
 import { useState } from 'react';
 
+import Image from 'next/image';
+
 const C = {
   bg:      '#05161A', // Deep Sea Background
   white:   '#072E33', // Deep Teal Card
@@ -63,8 +65,8 @@ export default function CartPage() {
 
         {items.map((item) => (
           <div key={item.id} className="p-4 rounded-3xl flex gap-4 transition-all" style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-white/5">
-              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-white/5 relative">
+              <Image src={item.image} alt={item.name} fill className="object-cover" />
             </div>
             <div className="flex-grow flex flex-col justify-between">
               <div>

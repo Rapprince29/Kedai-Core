@@ -6,6 +6,7 @@ import { useMenuStore } from '@/store/menuStore';
 import { useCartStore } from '@/store/cartStore';
 import { ShoppingCart, ArrowLeft, Search, X, Clock, ChevronRight, Waves, Zap, SlidersHorizontal, User } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import MenuCard from '@/components/menu/MenuCard';
 import axios from 'axios';
 
@@ -179,10 +180,11 @@ export default function MenuPage() {
       {/* ── HERO HEADER ── */}
       <div className="px-6 mt-8 mb-6">
         <div className="relative h-48 rounded-[32px] overflow-hidden group">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&q=80&fit=crop"
             alt="Hero"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#05161A] via-[#05161A]/80 to-transparent p-8 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-2">

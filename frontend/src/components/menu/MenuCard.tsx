@@ -3,6 +3,7 @@
 import { MenuItem, useCartStore } from '@/store/cartStore';
 import { Plus, Minus, X, Info, Star } from 'lucide-react';
 import React, { forwardRef, useState } from 'react';
+import Image from 'next/image';
 
 const C = {
   bg:      '#05161A', // Deep Sea Background
@@ -78,10 +79,11 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
               <Star className="w-3 h-3 text-[#05161A] fill-[#05161A]" />
             </div>
           )}
-          <img
+          <Image
             src={imgSrc}
             alt={item.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             style={{ transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}
             onError={() => {
               const fb = getFallback(item.category, item.id);
@@ -182,7 +184,7 @@ const MenuCard = forwardRef<HTMLDivElement, MenuCardProps>(({ item }, ref) => {
             
             <div className="h-72 w-full relative">
               <div className="absolute inset-0 bg-gradient-to-t from-[#072E33] to-transparent z-1" />
-              <img src={imgSrc} alt={item.name} className="w-full h-full object-cover" />
+              <Image src={imgSrc} alt={item.name} fill className="object-cover" />
             </div>
             
             <div className="p-10 -mt-10 relative z-10">

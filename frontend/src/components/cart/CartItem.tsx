@@ -3,6 +3,8 @@
 import { CartItem as CartItemType, useCartStore } from '@/store/cartStore';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
+import Image from 'next/image';
+
 const C = {
   bg:      '#051F20', // Primary (Background)
   white:   '#0B2B26', // Secondary
@@ -24,8 +26,8 @@ export default function CartItemComponent({ item }: CartItemProps) {
       className="flex gap-4 items-center p-3 rounded-2xl"
       style={{ backgroundColor: C.white, border: `1px solid ${C.border}`, boxShadow: `0 2px 12px rgba(107,66,38,0.05)` }}
     >
-      <div className="w-[72px] h-[72px] rounded-[14px] overflow-hidden shrink-0" style={{ backgroundColor: C.warm }}>
-        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+      <div className="w-[72px] h-[72px] rounded-[14px] overflow-hidden shrink-0 relative" style={{ backgroundColor: C.warm }}>
+        <Image src={item.image} alt={item.name} fill className="object-cover" />
       </div>
       <div className="flex-grow min-w-0">
         <p
