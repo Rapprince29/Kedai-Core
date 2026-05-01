@@ -193,7 +193,7 @@ export default function WelcomePage() {
               </div>
 
               <h1 ref={heroTitleRef} className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-[0.9] tracking-tighter mb-8 md:mb-12 uppercase break-words">
-                 Code<br/><span className="text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>In Every</span><br/>Drop
+                 Crafted<br/><span className="text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>In Every</span><br/>Core
               </h1>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-12 md:mb-16">
