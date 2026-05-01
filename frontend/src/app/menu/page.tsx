@@ -58,9 +58,12 @@ export default function MenuPage() {
     // Fetch User Profile
     axios.get('/api/auth/me')
       .then(res => setUser(res.data.user))
-      .catch(() => {
-        // Backup redirect if not authenticated
-        window.location.href = '/auth/login';
+      .catch((err) => {
+        console.error('Session invalid or expired');
+        if (err.response?.status === 401) {
+           document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           window.location.href = '/auth/login';
+        }
       });
 
     const interval = setInterval(async () => {

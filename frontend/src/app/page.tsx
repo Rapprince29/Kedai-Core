@@ -65,7 +65,12 @@ export default function WelcomePage() {
   useEffect(() => {
     // Check if user is logged in
     fetch('/api/auth/me').then(res => {
-      if (res.ok) setIsLoggedIn(true);
+      if (res.ok) {
+        setIsLoggedIn(true);
+      } else if (res.status === 401) {
+        // Clear stale cookie to prevent loop
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      }
     }).catch(() => {});
 
     if (!preloaderDone) return;
