@@ -5,17 +5,10 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('token')?.value
   const { pathname } = request.nextUrl
 
-  // Protected routes
+  // Redirect to login if visiting protected routes without token
   if (pathname.startsWith('/menu') || pathname.startsWith('/cart') || pathname.startsWith('/checkout') || pathname.startsWith('/admin') || pathname.startsWith('/cashier')) {
     if (!token) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
-  }
-
-  // Redirect to menu if already logged in and visiting auth pages
-  if (pathname.startsWith('/auth')) {
-    if (token) {
-      return NextResponse.redirect(new URL('/menu', request.url))
     }
   }
 

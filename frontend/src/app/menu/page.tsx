@@ -138,49 +138,39 @@ export default function MenuPage() {
     <div className="min-h-screen pb-36 text-white" style={{ backgroundColor: C.bg }}>
 
       {/* ── IMMERSIVE HEADER ── */}
-      <header
-        className="sticky top-0 z-50 backdrop-blur-3xl px-6 py-5 flex justify-between items-center"
-        style={{ borderBottom: `1px solid ${C.border}` }}
-      >
-        <div className="flex items-center gap-4">
-           <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center bg-teal-400/10 border border-teal-400/20">
-              <User className="w-5 h-5 md:w-6 md:h-6 text-teal-400" />
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-6 md:py-6 flex justify-between items-center bg-transparent backdrop-blur-xl border-b border-white/5">
+        <div className="flex items-center gap-3 md:gap-4">
+           <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20">
+              <User className="w-5 md:w-6 h-5 md:h-6 text-teal-400" />
            </div>
            <div>
-              <h1 className="text-sm md:text-xl font-black tracking-tighter leading-tight uppercase">
-                {user?.name || 'Explorer'}
+              <h1 className="text-lg md:text-xl font-black text-white uppercase tracking-tighter">
+                {user?.name || 'GUEST'}
               </h1>
-              <span className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 opacity-60">
-                {user?.role || 'Guest'}
-              </span>
+              <p className="text-[7px] md:text-[8px] font-black text-teal-400 uppercase tracking-[0.2em] opacity-60">
+                {user?.role || 'Identifying...'}
+              </p>
            </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={async () => {
-              if (window.confirm('Are you sure you want to exit the Deep Sea?')) {
-                await axios.post('/api/auth/logout');
-                window.location.href = '/auth/login';
-              }
-            }}
-            className="p-2 md:p-2.5 rounded-xl md:rounded-2xl transition-all hover:scale-105 active:scale-95 opacity-40 hover:opacity-100"
-            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <Zap className="w-4 h-4 md:w-5 md:h-5 text-red-400" />
-          </button>
-          
-          <Link href="/cart"
-            className="relative p-2.5 md:p-3 rounded-xl md:rounded-2xl transition-all hover:scale-105 active:scale-95"
-            style={{ backgroundColor: C.white, border: `1px solid ${C.border}` }}>
-            <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" style={{ color: C.terra }} />
-            {getTotalItems() > 0 && (
-              <span
-                className="absolute -top-1 -right-1 text-[8px] md:text-[10px] font-black w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full text-[#05161A]"
-                style={{ backgroundColor: C.terra }}>
-                {getTotalItems()}
-              </span>
-            )}
-          </Link>
+           <button 
+             onClick={async () => {
+               await axios.post('/api/auth/logout');
+               window.location.href = '/';
+             }}
+             className="px-3 py-2 rounded-xl bg-white/5 text-[8px] font-black text-white/40 uppercase tracking-widest hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
+           >
+             Logout
+           </button>
+           <Link href="/cart" className="relative p-3 md:p-4 rounded-2xl bg-teal-500 text-[#05161A] shadow-[0_10px_20px_rgba(15,150,156,0.2)] active:scale-90 transition-all">
+             <ShoppingCart className="w-5 md:w-6 h-5 md:h-6" />
+             {getTotalItems() > 0 && (
+               <span className="absolute -top-1 -right-1 w-5 md:w-6 h-5 md:h-6 bg-white rounded-full flex items-center justify-center text-[8px] md:text-[10px] font-black border-2 border-teal-500">
+                 {getTotalItems()}
+               </span>
+             )}
+           </Link>
         </div>
       </header>
 
