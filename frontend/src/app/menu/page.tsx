@@ -55,7 +55,12 @@ export default function MenuPage() {
     fetchMenu();
 
     // Fetch User Profile
-    axios.get('/api/auth/me').then(res => setUser(res.data.user)).catch(() => {});
+    axios.get('/api/auth/me')
+      .then(res => setUser(res.data.user))
+      .catch(() => {
+        // Backup redirect if not authenticated
+        window.location.href = '/auth/login';
+      });
 
     const interval = setInterval(async () => {
       try {

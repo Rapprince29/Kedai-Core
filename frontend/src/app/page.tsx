@@ -251,7 +251,7 @@ export default function WelcomePage() {
                       </div>
                       <p className="text-xs text-white/40 leading-relaxed mb-8">{item.desc}</p>
                       <Link href="/menu" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-teal-400 transition-colors">
-                         View Details <ExternalLink className="w-3 h-3" />
+                         {isLoggedIn ? 'View Details' : 'Login to View'} <ExternalLink className="w-3 h-3" />
                       </Link>
                    </div>
                  ))}
@@ -298,8 +298,8 @@ export default function WelcomePage() {
                     </div>
                  </div>
 
-                 <Link href="/auth/register" className="inline-flex items-center gap-4 text-xs font-black uppercase tracking-[0.3em] text-white group">
-                    Join The Collective <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-teal-500 group-hover:border-teal-500 group-hover:text-[#05161A] transition-all"><ArrowRight className="w-5 h-5" /></div>
+                 <Link href={isLoggedIn ? "/menu" : "/auth/register"} className="inline-flex items-center gap-4 text-xs font-black uppercase tracking-[0.3em] text-white group">
+                    {isLoggedIn ? 'Explore The Menu' : 'Join The Collective'} <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-teal-500 group-hover:border-teal-500 group-hover:text-[#05161A] transition-all"><ArrowRight className="w-5 h-5" /></div>
                  </Link>
               </div>
            </div>
