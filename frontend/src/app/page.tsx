@@ -54,6 +54,7 @@ const FEATURED = [
 
 export default function WelcomePage() {
   const [preloaderDone, setPreloaderDone] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
@@ -61,6 +62,11 @@ export default function WelcomePage() {
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Check if user is logged in
+    fetch('/api/auth/me').then(res => {
+      if (res.ok) setIsLoggedIn(true);
+    }).catch(() => {});
+
     if (!preloaderDone) return;
 
     // Register ScrollTrigger
@@ -186,12 +192,14 @@ export default function WelcomePage() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-16">
                  <Link href="/menu" className="hero-cta group relative px-12 py-5 rounded-2xl bg-teal-500 text-[#05161A] font-black text-xs uppercase tracking-[0.3em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(15,150,156,0.3)]">
                     <span className="relative z-10 flex items-center gap-3">
-                       Explore Menu <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                       {isLoggedIn ? 'Open Digital Menu' : 'Login to View Menu'} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </span>
                  </Link>
-                 <Link href="/auth/login" className="hero-cta px-12 py-5 rounded-2xl bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all">
-                    Sign In
-                 </Link>
+                 {!isLoggedIn && (
+                   <Link href="/auth/register" className="hero-cta px-12 py-5 rounded-2xl bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all">
+                      Create Identity
+                   </Link>
+                 )}
               </div>
            </div>
 
