@@ -56,6 +56,7 @@ const FEATURED = [
 export default function WelcomePage() {
   const [preloaderDone, setPreloaderDone] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
@@ -71,7 +72,7 @@ export default function WelcomePage() {
         // Clear stale cookie to prevent loop
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setAuthLoading(false));
 
     if (!preloaderDone) return;
 
@@ -196,9 +197,10 @@ export default function WelcomePage() {
               </h1>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-12 md:mb-16">
-                 <Link href="/menu" className="hero-cta w-full sm:w-auto group relative px-8 md:px-12 py-4 md:py-5 rounded-2xl bg-teal-500 text-[#05161A] font-black text-[10px] md:text-xs uppercase tracking-[0.3em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(15,150,156,0.3)]">
+                 <Link href={authLoading ? "#" : (isLoggedIn ? "/menu" : "/auth/login")} className={`hero-cta w-full sm:w-auto group relative px-8 md:px-12 py-4 md:py-5 rounded-2xl bg-teal-500 text-[#05161A] font-black text-[10px] md:text-xs uppercase tracking-[0.3em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(15,150,156,0.3)] ${authLoading ? 'opacity-50 cursor-wait' : ''}`}>
                     <span className="relative z-10 flex items-center justify-center gap-3">
-                       {isLoggedIn ? 'Open Digital Menu' : 'Login to View Menu'} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                       {authLoading ? 'Checking Access...' : (isLoggedIn ? 'Open Digital Menu' : 'Login to View Menu')} 
+                       <ArrowRight className={`w-4 h-4 transition-transform ${authLoading ? 'animate-pulse' : 'group-hover:translate-x-1'}`} />
                     </span>
                  </Link>
                  {!isLoggedIn && (
@@ -258,7 +260,7 @@ export default function WelcomePage() {
                          <span className="text-xs md:text-sm font-black text-white">{item.price}</span>
                       </div>
                       <p className="text-[10px] md:text-xs text-white/40 leading-relaxed mb-6 md:mb-8">{item.desc}</p>
-                      <Link href="/menu" className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-teal-400 transition-colors">
+                      <Link href={isLoggedIn ? "/menu" : "/auth/login"} className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-teal-400 transition-colors">
                          {isLoggedIn ? 'View Details' : 'Login to View'} <ExternalLink className="w-3 h-3" />
                       </Link>
                    </div>
